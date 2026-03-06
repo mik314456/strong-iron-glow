@@ -96,6 +96,7 @@ export interface UserProfile {
   experience: ExperienceLevel | null;
   daysPerWeek: number | null;
   completedOnboardingAt: string | null;
+  hasCompletedSplitSelection?: boolean;
 }
 
 // Custom split: weekly schedule (e.g. PPL = 3 days, each day has name + exerciseIds)

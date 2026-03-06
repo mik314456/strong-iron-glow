@@ -22,6 +22,7 @@ interface OnboardingProps {
 
 export default function Onboarding({ onComplete }: OnboardingProps) {
   const [step, setStep] = useState(1);
+  const [direction, setDirection] = useState(1);
   const [profile, setProfile] = useState<Partial<UserProfile>>({
     name: '',
     age: null,
@@ -60,8 +61,20 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
     onComplete(completed);
   };
 
+  const progressPct = step === 1 ? 0 : ((step - 1) / 5) * 100;
+
   return (
-    <div className="min-h-screen bg-[#080808] flex flex-col max-w-lg mx-auto">
+    <div className="min-h-screen bg-bg-deep flex flex-col max-w-lg mx-auto">
+      {step > 1 && (
+        <div className="h-0.5 w-full bg-[#1e1e1e] flex-shrink-0">
+          <motion.div
+            className="h-full bg-accent"
+            initial={false}
+            animate={{ width: `${progressPct}%` }}
+            transition={{ duration: 0.2 }}
+          />
+        </div>
+      )}
       <AnimatePresence mode="wait">
         {step === 1 && (
           <motion.div
@@ -69,14 +82,14 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="flex-1 flex flex-col items-center justify-center px-6"
+            className="flex-1 flex flex-col items-center justify-center px-6 max-w-[400px] mx-auto w-full"
           >
-            <h1 className="text-5xl font-bold text-[#f97316] tracking-tight">Iron</h1>
-            <p className="mt-3 text-white/50 text-lg">Built around you.</p>
+            <h1 className="font-display text-5xl italic text-accent" style={{ letterSpacing: '-1px' }}>Iron</h1>
+            <p className="mt-3 text-text-secondary text-lg font-sans">Built around you.</p>
             <motion.button
-              whileTap={{ scale: 0.97 }}
-              onClick={() => setStep(2)}
-              className="mt-12 w-full max-w-sm py-4 rounded-2xl bg-[#f97316] text-white font-semibold text-lg shadow-premium-glow"
+              whileTap={{ scale: 0.99 }}
+              onClick={() => { setDirection(1); setStep(2); }}
+              className="mt-12 w-full h-14 rounded-[10px] bg-accent text-primary-foreground font-sans font-bold text-[15px] uppercase tracking-wider"
             >
               Get Started
             </motion.button>
@@ -86,24 +99,25 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
         {step === 2 && (
           <motion.div
             key="2"
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -20 }}
-            className="flex-1 flex flex-col justify-center px-6 pt-12"
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -8 }}
+            transition={{ duration: 0.2 }}
+            className="flex-1 flex flex-col justify-center px-6 pt-8 max-w-[400px] mx-auto w-full"
           >
-            <h2 className="text-2xl font-bold text-white mb-2">What's your name?</h2>
+            <h2 className="text-xl font-sans font-semibold text-text-primary mb-2">What's your name?</h2>
             <input
               value={profile.name ?? ''}
               onChange={e => update({ name: e.target.value })}
               placeholder="Your name"
-              className="w-full bg-[#111111] border border-[#252525] rounded-2xl px-5 py-4 text-lg text-white placeholder:text-white/40 outline-none focus:border-[#f97316]/50 mb-8"
+              className="w-full h-[52px] bg-bg-card border border-border rounded-[10px] px-4 text-[15px] text-text-primary placeholder:text-text-tertiary outline-none focus:border-accent mb-8 font-sans transition-smooth"
               autoFocus
             />
             <motion.button
-              whileTap={{ scale: 0.97 }}
-              onClick={() => setStep(3)}
+              whileTap={{ scale: 0.99 }}
+              onClick={() => { setDirection(1); setStep(3); }}
               disabled={!profile.name?.trim()}
-              className="w-full py-4 rounded-2xl bg-[#f97316] text-white font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full h-14 rounded-[10px] bg-accent text-primary-foreground font-sans font-bold text-[15px] uppercase tracking-wider disabled:bg-bg-raised disabled:text-text-tertiary disabled:cursor-not-allowed"
             >
               Continue
             </motion.button>
@@ -113,14 +127,15 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
         {step === 3 && (
           <motion.div
             key="3"
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -20 }}
-            className="flex-1 px-6 pt-12 pb-8 overflow-y-auto"
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -8 }}
+            transition={{ duration: 0.2 }}
+            className="flex-1 px-6 pt-8 pb-8 overflow-y-auto max-w-[400px] mx-auto w-full"
           >
-            <h2 className="text-2xl font-bold text-white mb-6">Your stats</h2>
+            <h2 className="text-xl font-sans font-semibold text-text-primary mb-6">Your stats</h2>
 
-            <label className="block text-sm text-white/60 mb-1">Age</label>
+            <label className="block text-sm text-text-secondary font-sans mb-1">Age</label>
             <input
               type="number"
               min={13}
@@ -128,15 +143,15 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
               value={profile.age ?? ''}
               onChange={e => update({ age: e.target.value ? Number(e.target.value) : null })}
               placeholder="25"
-              className="w-full bg-[#111111] border border-[#252525] rounded-xl px-4 py-3 text-white placeholder:text-white/40 outline-none focus:border-[#f97316]/50 mb-4"
+              className="w-full h-[52px] bg-bg-card border border-border rounded-[10px] px-4 text-[15px] text-text-primary placeholder:text-text-tertiary outline-none focus:border-accent mb-4 font-sans transition-smooth"
             />
 
             <div className="flex items-center justify-between mb-2">
-              <label className="text-sm text-white/60">Height</label>
+              <label className="text-sm text-text-secondary font-sans">Height</label>
               <button
                 type="button"
                 onClick={() => update({ heightUnit: profile.heightUnit === 'cm' ? 'ft' : 'cm' })}
-                className="text-sm text-[#f97316] font-medium"
+                className="text-sm text-accent font-sans font-medium"
               >
                 {profile.heightUnit === 'cm' ? 'Switch to ft/in' : 'Switch to cm'}
               </button>
@@ -149,7 +164,7 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
                 value={profile.heightCm ?? ''}
                 onChange={e => update({ heightCm: e.target.value ? Number(e.target.value) : null })}
                 placeholder="175 cm"
-                className="w-full bg-[#111111] border border-[#252525] rounded-xl px-4 py-3 text-white placeholder:text-white/40 outline-none focus:border-[#f97316]/50 mb-4"
+                className="w-full h-[52px] bg-bg-card border border-border rounded-[10px] px-4 text-[15px] text-text-primary placeholder:text-text-tertiary outline-none focus:border-accent mb-4 font-sans transition-smooth"
               />
             ) : (
               <div className="flex gap-2 mb-4">
@@ -160,7 +175,7 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
                   value={profile.heightFeet ?? ''}
                   onChange={e => update({ heightFeet: e.target.value ? Number(e.target.value) : null })}
                   placeholder="5 ft"
-                  className="flex-1 bg-[#111111] border border-[#252525] rounded-xl px-4 py-3 text-white placeholder:text-white/40 outline-none focus:border-[#f97316]/50"
+                  className="flex-1 h-[52px] bg-bg-card border border-border rounded-[10px] px-4 text-[15px] text-text-primary placeholder:text-text-tertiary outline-none focus:border-accent font-sans transition-smooth"
                 />
                 <input
                   type="number"
@@ -169,17 +184,17 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
                   value={profile.heightInches ?? ''}
                   onChange={e => update({ heightInches: e.target.value ? Number(e.target.value) : null })}
                   placeholder="10 in"
-                  className="flex-1 bg-[#111111] border border-[#252525] rounded-xl px-4 py-3 text-white placeholder:text-white/40 outline-none focus:border-[#f97316]/50"
+                  className="flex-1 h-[52px] bg-bg-card border border-border rounded-[10px] px-4 text-[15px] text-text-primary placeholder:text-text-tertiary outline-none focus:border-accent font-sans transition-smooth"
                 />
               </div>
             )}
 
             <div className="flex items-center justify-between mb-2">
-              <label className="text-sm text-white/60">Weight</label>
+              <label className="text-sm text-text-secondary font-sans">Weight</label>
               <button
                 type="button"
                 onClick={() => update({ weightUnit: profile.weightUnit === 'kg' ? 'lbs' : 'kg' })}
-                className="text-sm text-[#f97316] font-medium"
+                className="text-sm text-accent font-sans font-medium"
               >
                 {profile.weightUnit === 'kg' ? 'Switch to lbs' : 'Switch to kg'}
               </button>
@@ -193,10 +208,10 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
                 if (profile.weightUnit === 'kg') update({ weightKg: v }); else update({ weightLbs: v });
               }}
               placeholder={profile.weightUnit === 'kg' ? '70 kg' : '154 lbs'}
-              className="w-full bg-[#111111] border border-[#252525] rounded-xl px-4 py-3 text-white placeholder:text-white/40 outline-none focus:border-[#f97316]/50 mb-4"
+              className="w-full h-[52px] bg-bg-card border border-border rounded-[10px] px-4 text-[15px] text-text-primary placeholder:text-text-tertiary outline-none focus:border-accent mb-4 font-sans transition-smooth"
             />
 
-            <label className="block text-sm text-white/60 mb-1">Body fat % (optional)</label>
+            <label className="block text-sm text-text-secondary font-sans mb-1">Body fat % (optional)</label>
             <div className="flex items-center gap-3 mb-2">
               <input
                 type="range"
@@ -204,23 +219,23 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
                 max={40}
                 value={profile.bodyFatPct ?? 20}
                 onChange={e => update({ bodyFatPct: Number(e.target.value) })}
-                className="flex-1 accent-[#f97316]"
+                className="flex-1 accent-accent"
               />
-              <span className="text-white font-medium w-10">{(profile.bodyFatPct ?? 20)}%</span>
+              <span className="text-text-primary font-sans font-medium w-10">{(profile.bodyFatPct ?? 20)}%</span>
             </div>
-            <p className="text-xs text-white/40 mb-4">Slide to set or leave default</p>
+            <p className="text-xs text-text-secondary mb-4 font-sans">Slide to set or leave default</p>
 
-            <label className="block text-sm text-white/60 mb-2">Training experience</label>
+            <label className="block text-sm text-text-secondary font-sans mb-2">Training experience</label>
             <div className="flex flex-wrap gap-2 mb-8">
               {EXPERIENCE_OPTIONS.map(opt => (
                 <button
                   key={opt.id}
                   type="button"
                   onClick={() => update({ experience: opt.id })}
-                  className={`px-4 py-2.5 rounded-full text-sm font-medium border transition-colors ${
+                  className={`px-4 py-2.5 rounded-full text-sm font-sans font-medium border transition-smooth ${
                     profile.experience === opt.id
-                      ? 'bg-[#f97316] text-white border-[#f97316]'
-                      : 'bg-[#111111] border-[#252525] text-white/70 hover:border-white/30'
+                      ? 'bg-bg-raised text-text-primary border-accent'
+                      : 'bg-bg-card border-border text-text-secondary hover:border-border-bright'
                   }`}
                 >
                   {opt.label}
@@ -229,9 +244,9 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
             </div>
 
             <motion.button
-              whileTap={{ scale: 0.97 }}
-              onClick={() => setStep(4)}
-              className="w-full py-4 rounded-2xl bg-[#f97316] text-white font-semibold"
+              whileTap={{ scale: 0.99 }}
+              onClick={() => { setDirection(1); setStep(4); }}
+              className="w-full h-14 rounded-[10px] bg-accent text-primary-foreground font-sans font-bold text-[15px] uppercase tracking-wider"
             >
               Continue
             </motion.button>
@@ -241,12 +256,13 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
         {step === 4 && (
           <motion.div
             key="4"
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -20 }}
-            className="flex-1 px-6 pt-12 pb-8"
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -8 }}
+            transition={{ duration: 0.2 }}
+            className="flex-1 px-6 pt-8 pb-8 max-w-[400px] mx-auto w-full"
           >
-            <h2 className="text-2xl font-bold text-white mb-6">Your goal</h2>
+            <h2 className="text-xl font-sans font-semibold text-text-primary mb-6">Your goal</h2>
             <div className="grid grid-cols-2 gap-4 mb-8">
               {GOAL_OPTIONS.map(opt => {
                 const Icon = opt.icon;
@@ -254,23 +270,23 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
                 return (
                   <motion.button
                     key={opt.id}
-                    whileTap={{ scale: 0.97 }}
+                    whileTap={{ scale: 0.98 }}
                     type="button"
                     onClick={() => update({ goal: opt.id })}
-                    className={`p-5 rounded-2xl border-2 flex flex-col items-center gap-3 text-left ${
-                      selected ? 'border-[#f97316] bg-[#f97316]/10' : 'border-[#252525] bg-[#111111]'
+                    className={`p-5 rounded-[16px] border flex flex-col items-center gap-3 text-left transition-smooth ${
+                      selected ? 'border-accent bg-bg-raised' : 'border-border bg-bg-card hover:bg-[#161616] hover:border-border-bright'
                     }`}
                   >
-                    <Icon size={32} className={selected ? 'text-[#f97316]' : 'text-white/60'} />
-                    <span className="font-semibold text-white text-sm text-center">{opt.label}</span>
+                    <Icon size={28} className={selected ? 'text-accent' : 'text-text-tertiary'} />
+                    <span className="font-sans font-semibold text-text-primary text-sm text-center">{opt.label}</span>
                   </motion.button>
                 );
               })}
             </div>
             <motion.button
-              whileTap={{ scale: 0.97 }}
-              onClick={() => setStep(5)}
-              className="w-full py-4 rounded-2xl bg-[#f97316] text-white font-semibold"
+              whileTap={{ scale: 0.99 }}
+              onClick={() => { setDirection(1); setStep(5); }}
+              className="w-full h-14 rounded-[10px] bg-accent text-primary-foreground font-sans font-bold text-[15px] uppercase tracking-wider"
             >
               Continue
             </motion.button>
@@ -280,23 +296,24 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
         {step === 5 && (
           <motion.div
             key="5"
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -20 }}
-            className="flex-1 px-6 pt-12 pb-8"
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -8 }}
+            transition={{ duration: 0.2 }}
+            className="flex-1 px-6 pt-8 pb-8 max-w-[400px] mx-auto w-full"
           >
-            <h2 className="text-2xl font-bold text-white mb-2">How often do you train?</h2>
-            <p className="text-white/50 text-sm mb-6">Sessions per week</p>
+            <h2 className="text-xl font-sans font-semibold text-text-primary mb-2">How often do you train?</h2>
+            <p className="text-text-secondary text-sm font-sans mb-6">Sessions per week</p>
             <div className="flex flex-wrap gap-2 mb-8">
               {[2, 3, 4, 5, 6].map(n => (
                 <button
                   key={n}
                   type="button"
                   onClick={() => update({ daysPerWeek: n })}
-                  className={`px-6 py-3 rounded-full text-base font-semibold border transition-colors ${
+                  className={`px-6 py-3 rounded-full text-base font-sans font-semibold border transition-smooth ${
                     profile.daysPerWeek === n
-                      ? 'bg-[#f97316] text-white border-[#f97316]'
-                      : 'bg-[#111111] border-[#252525] text-white/70'
+                      ? 'bg-bg-raised text-text-primary border-accent'
+                      : 'bg-bg-card border-border text-text-secondary hover:border-border-bright'
                   }`}
                 >
                   {n}x
@@ -304,9 +321,9 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
               ))}
             </div>
             <motion.button
-              whileTap={{ scale: 0.97 }}
-              onClick={() => setStep(6)}
-              className="w-full py-4 rounded-2xl bg-[#f97316] text-white font-semibold"
+              whileTap={{ scale: 0.99 }}
+              onClick={() => { setDirection(1); setStep(6); }}
+              className="w-full h-14 rounded-[10px] bg-accent text-primary-foreground font-sans font-bold text-[15px] uppercase tracking-wider"
             >
               Continue
             </motion.button>
@@ -316,43 +333,44 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
         {step === 6 && (
           <motion.div
             key="6"
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -20 }}
-            className="flex-1 px-6 pt-12 pb-8 overflow-y-auto"
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -8 }}
+            transition={{ duration: 0.2 }}
+            className="flex-1 px-6 pt-8 pb-8 overflow-y-auto max-w-[400px] mx-auto w-full"
           >
-            <h2 className="text-2xl font-bold text-white mb-2">Here's your profile</h2>
-            <p className="text-white/50 text-sm mb-6">Review and continue to start training.</p>
+            <h2 className="text-xl font-sans font-semibold text-text-primary mb-2">Here's your profile</h2>
+            <p className="text-text-secondary text-sm font-sans mb-6">Review and continue to start training.</p>
 
-            <div className="bg-[#111111] border border-[#252525] rounded-2xl p-5 mb-8 space-y-3">
-              <p className="text-white font-medium">{profile.name || '—'}</p>
-              <p className="text-sm text-white/50">Age: {profile.age ?? '—'}</p>
-              <p className="text-sm text-white/50">
+            <div className="bg-bg-card border border-border rounded-[16px] p-5 mb-8 space-y-3">
+              <p className="text-text-primary font-sans font-medium">{profile.name || '—'}</p>
+              <p className="text-sm text-text-secondary font-sans">Age: {profile.age ?? '—'}</p>
+              <p className="text-sm text-text-secondary font-sans">
                 Height: {profile.heightUnit === 'cm'
                   ? (profile.heightCm ? `${profile.heightCm} cm` : '—')
                   : (profile.heightFeet != null && profile.heightInches != null ? `${profile.heightFeet}'${profile.heightInches}"` : '—')}
               </p>
-              <p className="text-sm text-white/50">
+              <p className="text-sm text-text-secondary font-sans">
                 Weight: {profile.weightUnit === 'kg'
                   ? (profile.weightKg ? `${profile.weightKg} kg` : '—')
                   : (profile.weightLbs ? `${profile.weightLbs} lbs` : '—')}
               </p>
               {profile.bodyFatPct != null && (
-                <p className="text-sm text-white/50">Body fat: {profile.bodyFatPct}%</p>
+                <p className="text-sm text-text-secondary font-sans">Body fat: {profile.bodyFatPct}%</p>
               )}
-              <p className="text-sm text-white/50">
+              <p className="text-sm text-text-secondary font-sans">
                 Goal: {profile.goal ? GOAL_OPTIONS.find(g => g.id === profile.goal)?.label : '—'}
               </p>
-              <p className="text-sm text-white/50">
+              <p className="text-sm text-text-secondary font-sans">
                 Experience: {profile.experience ? EXPERIENCE_OPTIONS.find(e => e.id === profile.experience)?.label : '—'}
               </p>
-              <p className="text-sm text-white/50">Train: {profile.daysPerWeek ?? '—'}x per week</p>
+              <p className="text-sm text-text-secondary font-sans">Train: {profile.daysPerWeek ?? '—'}x per week</p>
             </div>
 
             <motion.button
-              whileTap={{ scale: 0.97 }}
+              whileTap={{ scale: 0.99 }}
               onClick={handleFinish}
-              className="w-full py-4 rounded-2xl bg-[#f97316] text-white font-semibold text-lg shadow-premium-glow"
+              className="w-full h-14 rounded-[10px] bg-accent text-primary-foreground font-sans font-bold text-[15px] uppercase tracking-wider"
             >
               Continue
             </motion.button>
@@ -364,8 +382,8 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
         <div className="px-6 pb-8">
           <button
             type="button"
-            onClick={() => setStep(s => Math.max(1, s - 1))}
-            className="text-sm text-white/50 hover:text-white/80"
+            onClick={() => { setDirection(-1); setStep(s => Math.max(1, s - 1)); }}
+            className="text-sm text-text-secondary hover:text-text-primary font-sans transition-smooth"
           >
             Back
           </button>

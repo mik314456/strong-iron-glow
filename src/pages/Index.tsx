@@ -6,6 +6,7 @@ import HistoryTab from '@/components/HistoryTab';
 import ExercisesTab from '@/components/ExercisesTab';
 import ProfileTab from '@/components/ProfileTab';
 import Onboarding from '@/components/Onboarding';
+import SplitSelectionScreen from '@/components/SplitSelectionScreen';
 import {
   useExercises, useTemplates, useSessions, useRecords,
   useSettings, useActiveWorkout, useUserProfile, useSplits,
@@ -16,7 +17,7 @@ import { formatDistanceToNow } from 'date-fns';
 
 const Index = () => {
   const [tab, setTab] = useState<TabId>('workout');
-  const { profile, setProfile, hasCompletedOnboarding } = useUserProfile();
+  const { profile, setProfile, updateProfile, hasCompletedOnboarding } = useUserProfile();
   const { exercises, addExercise } = useExercises();
   const { templates } = useTemplates();
   const { sessions, addSession } = useSessions();
@@ -125,22 +126,33 @@ const Index = () => {
     );
   }
 
+  if (!profile.hasCompletedSplitSelection) {
+    return (
+      <SplitSelectionScreen
+        profile={profile}
+        exercises={exercises}
+        onAddSplit={addSplit}
+        onComplete={() => updateProfile({ hasCompletedSplitSelection: true })}
+      />
+    );
+  }
+
   return (
-    <div className="min-h-screen flex flex-col bg-[#080808] max-w-lg mx-auto relative">
-      {/* Resume banner — premium */}
+    <div className="min-h-screen flex flex-col bg-bg-deep max-w-lg mx-auto relative">
+      {/* Resume banner */}
       {showResumeBanner && activeWorkout && tab !== 'workout' && (
-        <div className="fixed top-0 left-0 right-0 z-40 bg-[#111111]/95 backdrop-blur-xl border-b border-[#252525] px-4 py-3.5 flex items-center justify-between max-w-lg mx-auto shadow-premium">
-          <p className="text-sm text-white/90">
-            Session in progress <span className="text-white/50">·</span> {formatDistanceToNow(new Date(activeWorkout.startTime))} ago
+        <div className="fixed top-0 left-0 right-0 z-40 bg-bg-card border-b border-border-subtle px-4 py-3.5 flex items-center justify-between max-w-lg mx-auto">
+          <p className="text-sm text-text-primary font-sans">
+            Session in progress <span className="text-text-secondary">·</span> {formatDistanceToNow(new Date(activeWorkout.startTime))} ago
           </p>
           <div className="flex gap-2">
-            <button onClick={discardWorkout} className="text-xs text-white/60 px-3 py-2 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 transition-colors">Discard</button>
-            <button onClick={() => setShowResumeBanner(false)} className="text-xs text-white font-semibold px-3 py-2 rounded-xl bg-[#f97316] border border-[#f97316]/50 shadow-premium-glow transition-colors">Resume</button>
+            <button onClick={discardWorkout} className="text-xs text-text-secondary px-3 py-2 rounded-[10px] bg-bg-raised border border-border hover:border-border-bright transition-smooth">Discard</button>
+            <button onClick={() => setShowResumeBanner(false)} className="text-xs font-sans font-bold uppercase tracking-wider text-primary-foreground px-3 py-2 rounded-[10px] bg-accent transition-smooth hover:bg-[#f0e8d8] active:scale-[0.99]">Resume</button>
           </div>
         </div>
       )}
 
-      <div className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden">
+      <div className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden bg-bg-deep">
         <AnimatePresence mode="wait">
           <motion.div
             key={tab}

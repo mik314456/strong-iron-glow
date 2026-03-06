@@ -129,13 +129,14 @@ const SplitBuilder: React.FC<SplitBuilderProps> = ({
 
   return (
     <Sheet open={open} onOpenChange={handleOpenChange}>
-      <SheetContent side="bottom" className="h-[90vh] rounded-t-3xl border-t border-[#252525] bg-[#0a0a0a]">
-        <SheetHeader className="border-b border-[#252525] pb-4">
-          <SheetTitle className="text-white">
+      <SheetContent side="bottom" className="h-[90vh] rounded-t-3xl border-t border-border bg-bg-deep flex flex-col overflow-hidden">
+        <SheetHeader className="flex-shrink-0 border-b border-border pb-4">
+          <SheetTitle className="text-text-primary font-sans font-semibold">
             {isEdit ? 'Edit split' : 'Create split'}
           </SheetTitle>
         </SheetHeader>
 
+        <div className="flex-1 min-h-0 flex flex-col overflow-hidden">
         <AnimatePresence mode="wait">
           {step === 1 && (
             <motion.div
@@ -145,13 +146,13 @@ const SplitBuilder: React.FC<SplitBuilderProps> = ({
               exit={{ opacity: 0, x: 10 }}
               className="pt-6"
             >
-              <label className="text-sm font-medium text-white/80 block mb-2">Split name</label>
+              <label className="text-sm font-sans font-medium text-text-primary block mb-2">Split name</label>
               <input
                 type="text"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="e.g. PPL, Bro Split, Upper Lower"
-                className="w-full bg-[#111111] border border-[#252525] rounded-xl px-4 py-3.5 text-white text-lg placeholder:text-white/40 focus:border-[#f97316]/50 outline-none"
+                className="w-full h-[52px] bg-bg-card border border-border rounded-[10px] px-4 text-text-primary text-[15px] placeholder:text-text-tertiary focus:border-accent outline-none font-sans transition-smooth"
               />
             </motion.div>
           )}
@@ -164,17 +165,17 @@ const SplitBuilder: React.FC<SplitBuilderProps> = ({
               exit={{ opacity: 0, x: 10 }}
               className="pt-6"
             >
-              <label className="text-sm font-medium text-white/80 block mb-3">Training days per week</label>
+              <label className="text-sm font-sans font-medium text-text-primary block mb-3">Training days per week</label>
               <div className="flex flex-wrap gap-2">
                 {DAY_COUNTS.map((n) => (
                   <button
                     key={n}
                     type="button"
                     onClick={() => setNumDays(n)}
-                    className={`px-4 py-2.5 rounded-full text-sm font-semibold transition-colors ${
+                    className={`px-4 py-2.5 rounded-full text-sm font-sans font-semibold transition-smooth ${
                       numDays === n
-                        ? 'bg-[#f97316] text-white'
-                        : 'bg-[#111111] text-white/70 border border-[#252525] hover:border-[#f97316]/50'
+                        ? 'bg-accent text-[#0a0a0a]'
+                        : 'bg-bg-card text-text-primary border border-border hover:border-accent'
                     }`}
                   >
                     {n}x
@@ -190,11 +191,12 @@ const SplitBuilder: React.FC<SplitBuilderProps> = ({
               initial={{ opacity: 0, x: -10 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: 10 }}
-              className="pt-4 pb-8 overflow-y-auto max-h-[calc(90vh-180px)]"
+              className="pt-4 overflow-y-auto overflow-x-hidden flex-1 min-h-0"
+              style={{ maxHeight: 'calc(90vh - 200px)', paddingBottom: '100px' }}
             >
               {days.slice(0, numDays).map((day, dayIndex) => (
                 <div key={day.id} className="mb-6">
-                  <label className="text-xs font-semibold text-white/50 uppercase tracking-wider block mb-2">
+                  <label className="text-[11px] font-sans font-semibold text-text-secondary uppercase tracking-[0.2em] block mb-2">
                     Day {dayIndex + 1}
                   </label>
                   <input
@@ -202,7 +204,7 @@ const SplitBuilder: React.FC<SplitBuilderProps> = ({
                     value={day.name}
                     onChange={(e) => setDayName(dayIndex, e.target.value)}
                     placeholder="e.g. Push, Pull, Legs"
-                    className="w-full bg-[#111111] border border-[#252525] rounded-xl px-3 py-2.5 text-white text-sm mb-3 focus:border-[#f97316]/50 outline-none"
+                    className="w-full bg-bg-card border border-border rounded-[10px] px-3 py-2.5 text-text-primary text-sm mb-3 focus:border-accent outline-none font-sans transition-smooth"
                   />
                   <ExercisePicker
                     exercises={exercises}
@@ -217,21 +219,22 @@ const SplitBuilder: React.FC<SplitBuilderProps> = ({
             </motion.div>
           )}
         </AnimatePresence>
+        </div>
 
-        <div className="absolute bottom-0 left-0 right-0 p-4 bg-[#0a0a0a] border-t border-[#252525] flex gap-2">
+        <div className="flex-shrink-0 p-4 bg-bg-deep border-t border-border flex gap-2">
           {step > 1 ? (
-            <Button type="button" variant="outline" onClick={handleBack} className="flex-1 rounded-full bg-[#111111] border-[#252525] text-white">
+            <Button type="button" variant="outline" onClick={handleBack} className="flex-1 h-12 rounded-[10px] bg-bg-card border-border text-text-primary font-sans">
               <ChevronLeft size={18} /> Back
             </Button>
           ) : (
             <div className="flex-1" />
           )}
           {step < 3 ? (
-            <Button type="button" onClick={handleNext} className="flex-1 rounded-full bg-[#f97316] text-white hover:bg-[#ea580c]">
+            <Button type="button" onClick={handleNext} className="flex-1 h-14 rounded-[10px] bg-accent text-[#0a0a0a] font-sans font-bold text-[15px] uppercase tracking-wider hover:bg-[#f0e8d8]">
               Continue <ChevronRight size={18} />
             </Button>
           ) : (
-            <Button type="button" onClick={handleSave} disabled={!canSave} className="flex-1 rounded-full bg-[#f97316] text-white hover:bg-[#ea580c]">
+            <Button type="button" onClick={handleSave} disabled={!canSave} className="flex-1 h-14 rounded-[10px] bg-accent text-[#0a0a0a] font-sans font-bold text-[15px] uppercase tracking-wider hover:bg-[#f0e8d8] disabled:bg-bg-raised disabled:text-text-tertiary">
               {isEdit ? 'Save changes' : 'Save split'}
             </Button>
           )}
@@ -263,18 +266,18 @@ const ExercisePicker: React.FC<ExercisePickerProps> = ({
         {selected.map((ex, idx) => (
           <div
             key={ex.id}
-            className="flex items-center gap-2 bg-[#111111] rounded-lg px-3 py-2 border border-[#252525]"
+            className="flex items-center gap-2 bg-bg-card rounded-[10px] px-3 py-2 border border-border"
           >
             <div className="flex flex-col gap-0">
-              <button type="button" onClick={() => onMoveUp(idx)} className="p-0.5 text-white/40 hover:text-white">
+              <button type="button" onClick={() => onMoveUp(idx)} className="p-0.5 text-text-tertiary hover:text-text-primary transition-smooth">
                 <ChevronRight size={14} className="rotate-[-90deg]" />
               </button>
-              <button type="button" onClick={() => onMoveDown(idx)} className="p-0.5 text-white/40 hover:text-white">
+              <button type="button" onClick={() => onMoveDown(idx)} className="p-0.5 text-text-tertiary hover:text-text-primary transition-smooth">
                 <ChevronRight size={14} className="rotate-90" />
               </button>
             </div>
-            <span className="flex-1 text-sm text-white">{ex.name}</span>
-            <button type="button" onClick={() => onRemove(ex.id)} className="p-1 text-white/40 hover:text-red-400">
+            <span className="flex-1 text-sm font-sans text-text-primary">{ex.name}</span>
+            <button type="button" onClick={() => onRemove(ex.id)} className="p-1 text-text-tertiary hover:text-danger transition-smooth">
               <Trash2 size={14} />
             </button>
           </div>
@@ -283,31 +286,34 @@ const ExercisePicker: React.FC<ExercisePickerProps> = ({
       <button
         type="button"
         onClick={() => setShowPicker(true)}
-        className="w-full py-2.5 rounded-xl border border-dashed border-[#252525] text-white/60 text-sm font-medium flex items-center justify-center gap-2 hover:bg-white/5"
+        className="w-full py-2.5 rounded-[10px] border border-dashed border-border text-text-secondary text-sm font-sans font-medium flex items-center justify-center gap-2 hover:bg-bg-raised/50 transition-smooth"
       >
         <Plus size={16} /> Add exercises
       </button>
 
       {showPicker && (
         <Sheet open={showPicker} onOpenChange={setShowPicker}>
-          <SheetContent side="bottom" className="h-[70vh] rounded-t-3xl border-t border-[#252525] bg-[#0a0a0a]">
-            <SheetHeader>
-              <SheetTitle className="text-white">Choose exercise</SheetTitle>
+          <SheetContent side="bottom" className="rounded-t-3xl border-t border-border bg-bg-deep flex flex-col max-h-[85vh]">
+            <SheetHeader className="flex-shrink-0">
+              <SheetTitle className="text-text-primary font-sans font-semibold">Choose exercise</SheetTitle>
             </SheetHeader>
-            <div className="overflow-y-auto py-4 space-y-1">
+            <div
+              className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden py-4 space-y-1"
+              style={{ maxHeight: 'calc(70vh - 80px)' }}
+            >
               {available.map((ex) => (
                 <button
                   key={ex.id}
                   type="button"
                   onClick={() => { onSelect(ex.id); setShowPicker(false); }}
-                  className="w-full text-left px-4 py-3 rounded-xl bg-[#111111] border border-[#252525] text-white hover:border-[#f97316]/50"
+                  className="w-full text-left px-4 py-3 rounded-[10px] bg-bg-card border border-border text-text-primary hover:border-accent font-sans transition-smooth"
                 >
                   {ex.name}
-                  <span className="text-xs text-white/50 block">{ex.muscleGroup}</span>
+                  <span className="text-xs text-text-secondary block">{ex.muscleGroup}</span>
                 </button>
               ))}
               {available.length === 0 && (
-                <p className="text-white/50 text-sm text-center py-4">All exercises added</p>
+                <p className="text-text-secondary text-sm font-sans text-center py-4">All exercises added</p>
               )}
             </div>
           </SheetContent>

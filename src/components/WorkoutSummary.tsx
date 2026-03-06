@@ -58,7 +58,7 @@ const WorkoutSummary: React.FC<WorkoutSummaryProps> = ({
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="fixed inset-0 z-[90] bg-[#080808] flex flex-col items-center justify-center p-6"
+        className="fixed inset-0 z-[90] bg-bg-deep flex flex-col items-center justify-center p-6"
       >
         <motion.div
           className="w-28 h-28 mb-8"
@@ -70,7 +70,7 @@ const WorkoutSummary: React.FC<WorkoutSummaryProps> = ({
             <motion.path
               d="M20 52 L42 72 L80 28"
               fill="none"
-              stroke="#22c55e"
+              stroke="var(--green)"
               strokeWidth="6"
               strokeLinecap="round"
               strokeLinejoin="round"
@@ -84,7 +84,7 @@ const WorkoutSummary: React.FC<WorkoutSummaryProps> = ({
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4 }}
-          className="text-2xl font-bold text-white mb-2"
+          className="text-2xl font-sans font-bold text-text-primary mb-2"
         >
           Session saved.
         </motion.h2>
@@ -100,9 +100,9 @@ const WorkoutSummary: React.FC<WorkoutSummaryProps> = ({
             { label: 'Exercises', value: String(exerciseCount) },
             { label: 'Sets', value: String(setCount) },
           ].map(({ label, value }) => (
-            <div key={label} className="bg-[#111111] rounded-xl border border-[#252525] p-3 text-center">
-              <p className="text-xl font-bold tabular-nums text-white">{value}</p>
-              <p className="text-xs text-white/50 mt-0.5 uppercase tracking-wider">{label}</p>
+            <div key={label} className="bg-bg-card rounded-[16px] border border-border p-3 text-center">
+              <p className="text-xl font-display font-normal tabular-nums text-text-primary">{value}</p>
+              <p className="text-[11px] font-sans uppercase tracking-[0.2em] text-text-secondary mt-0.5">{label}</p>
             </div>
           ))}
         </motion.div>
@@ -110,9 +110,9 @@ const WorkoutSummary: React.FC<WorkoutSummaryProps> = ({
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.6 }}
-          whileTap={{ scale: 0.97 }}
+          whileTap={{ scale: 0.99 }}
           onClick={handleShare}
-          className="mb-4 px-6 py-3 rounded-full border border-[#252525] text-white/80 text-sm font-medium flex items-center gap-2"
+          className="mb-4 px-6 py-3 rounded-[10px] border border-border text-text-primary text-sm font-sans font-medium flex items-center gap-2 transition-smooth"
         >
           <Share2 size={18} />
           {shared ? 'Copied to clipboard!' : 'Share'}
@@ -121,9 +121,9 @@ const WorkoutSummary: React.FC<WorkoutSummaryProps> = ({
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.7 }}
-          whileTap={{ scale: 0.97 }}
+          whileTap={{ scale: 0.99 }}
           onClick={handleDone}
-          className="px-8 py-3.5 rounded-full bg-[#f97316] text-white font-semibold"
+          className="px-8 h-14 rounded-[10px] bg-accent text-[#0a0a0a] font-sans font-bold text-[15px] uppercase tracking-wider"
         >
           Done
         </motion.button>
@@ -136,19 +136,19 @@ const WorkoutSummary: React.FC<WorkoutSummaryProps> = ({
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 z-[90] bg-black/80 backdrop-blur-sm flex items-center justify-center p-6"
+      className="fixed inset-0 z-[90] bg-bg-deep/90 backdrop-blur-sm flex items-center justify-center p-6"
     >
       <motion.div
         initial={{ scale: 0.9 }}
         animate={{ scale: 1 }}
         exit={{ scale: 0.9 }}
-        className="bg-[#111111] rounded-[24px] border border-[#252525] border-t-2 border-t-[#f97316] p-6 w-full max-w-sm shadow-[0_0_0_1px_rgba(255,255,255,0.05),0_4px_24px_rgba(0,0,0,0.4)]"
+        className="bg-bg-card rounded-[24px] border border-border border-t-2 border-t-accent p-6 w-full max-w-sm"
       >
         <div className="flex items-center justify-center gap-2 mb-6">
-          <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-[#22c55e]/20 border border-[#22c55e]/50">
-            <span className="block h-3 w-3 rounded-full bg-[#22c55e]" />
+          <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-success/20 border border-success/50">
+            <span className="block h-3 w-3 rounded-full bg-success" />
           </span>
-          <h2 className="text-lg font-bold text-white">Session complete</h2>
+          <h2 className="text-lg font-sans font-bold text-text-primary">Session complete</h2>
         </div>
 
         <div className="grid grid-cols-2 gap-4 mb-8">
@@ -160,10 +160,10 @@ const WorkoutSummary: React.FC<WorkoutSummaryProps> = ({
           ].map(({ label, value }) => (
             <div
               key={label}
-              className="bg-[#181818] rounded-[16px] border border-[#252525] p-3 text-center shadow-[0_0_0_1px_rgba(255,255,255,0.03)]"
+              className="bg-bg-raised/60 rounded-[16px] border border-border p-3 text-center"
             >
-              <p className="text-2xl font-bold tabular-nums text-white">{value}</p>
-              <p className="text-xs text-muted-foreground mt-1 uppercase tracking-[0.14em]">
+              <p className="text-2xl font-display font-normal tabular-nums text-text-primary">{value}</p>
+              <p className="text-[11px] font-sans uppercase tracking-[0.2em] text-text-secondary mt-1">
                 {label}
               </p>
             </div>
@@ -172,16 +172,16 @@ const WorkoutSummary: React.FC<WorkoutSummaryProps> = ({
 
         <div className="flex gap-3">
           <motion.button
-            whileTap={{ scale: 0.97 }}
+            whileTap={{ scale: 0.99 }}
             onClick={onDiscard}
-            className="flex-1 py-3 rounded-[14px] bg-transparent border border-[#ef4444]/50 text-sm font-semibold text-[#ef4444] hover:bg-[#ef4444]/10 transition-colors"
+            className="flex-1 h-12 rounded-[10px] bg-transparent border border-danger/50 text-sm font-sans font-semibold text-danger hover:bg-danger/10 transition-smooth"
           >
             Discard
           </motion.button>
           <motion.button
-            whileTap={{ scale: 0.97 }}
+            whileTap={{ scale: 0.99 }}
             onClick={handleSave}
-            className="flex-1 py-3 rounded-[14px] bg-gradient-to-r from-[#f97316] to-[#ea580c] text-white text-sm font-semibold shadow-premium-glow"
+            className="flex-1 h-12 rounded-[10px] bg-accent text-[#0a0a0a] text-sm font-sans font-bold uppercase tracking-wider"
           >
             Save session
           </motion.button>

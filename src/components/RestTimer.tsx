@@ -62,7 +62,7 @@ const RestTimer: React.FC<RestTimerProps> = ({ duration, onDismiss }) => {
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.2 }}
-          className="fixed inset-0 z-[100] pointer-events-none border-[4px] border-[#f97316] shadow-[inset_0_0_0_2px_rgba(249,115,22,0.3),0_0_60px_rgba(249,115,22,0.4)]"
+          className="fixed inset-0 z-[100] pointer-events-none border-[4px] border-accent"
         />
       )}
       <motion.div
@@ -70,23 +70,23 @@ const RestTimer: React.FC<RestTimerProps> = ({ duration, onDismiss }) => {
         animate={{ y: 0 }}
         exit={{ y: '100%' }}
         transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-        className="fixed bottom-0 left-0 right-0 z-50 bg-black/80 backdrop-blur-xl border-t border-[#252525] rounded-t-[28px] px-6 py-8 safe-bottom shadow-[0_0_0_1px_rgba(255,255,255,0.05),0_-4px_24px_rgba(0,0,0,0.6)]"
+        className="fixed bottom-0 left-0 right-0 z-50 bg-bg-card/98 backdrop-blur-xl border-t border-[#1e1e1e] rounded-t-[28px] px-6 py-8 safe-bottom"
         onClick={(e) => e.stopPropagation()}
       >
       <div className="flex justify-between items-center mb-6">
-        <span className="text-xs font-semibold uppercase tracking-[0.16em] text-white/50">Recover</span>
-        <motion.button whileTap={{ scale: 0.97 }} onClick={onDismiss} className="p-2 rounded-full hover:bg-white/5 transition-colors">
-          <X size={18} className="text-white/50" />
+        <span className="text-xs font-sans font-semibold uppercase tracking-[0.16em] text-text-secondary">Recover</span>
+        <motion.button whileTap={{ scale: 0.99 }} onClick={onDismiss} className="p-2 rounded-full hover:bg-bg-raised transition-smooth">
+          <X size={18} className="text-text-secondary" />
         </motion.button>
       </div>
 
       <div className="flex flex-col items-center">
         <div className="relative w-40 h-40 mb-6">
           <svg className="w-full h-full -rotate-90" viewBox="0 0 140 140">
-            <circle cx="70" cy="70" r="60" fill="none" stroke="#252525" strokeWidth="8" />
+            <circle cx="70" cy="70" r="60" fill="none" stroke="var(--border)" strokeWidth="8" />
             <circle
               cx="70" cy="70" r="60" fill="none"
-              stroke="#f97316"
+              stroke="var(--accent)"
               strokeWidth="8"
               strokeLinecap="round"
               strokeDasharray={circumference}
@@ -95,32 +95,32 @@ const RestTimer: React.FC<RestTimerProps> = ({ duration, onDismiss }) => {
             />
           </svg>
           <div className="absolute inset-0 flex items-center justify-center">
-            <span className="text-5xl font-bold text-[#f97316] font-mono">{formatTime(remaining)}</span>
+            <span className="text-5xl font-bold text-accent font-mono">{formatTime(remaining)}</span>
           </div>
         </div>
 
         <div className="flex items-center gap-4">
           <motion.button
-            whileTap={{ scale: 0.97 }}
+            whileTap={{ scale: 0.99 }}
             onClick={() => { setRemaining(r => Math.max(0, r - 15)); setTotal(t => Math.max(15, t - 15)); }}
-            className="px-4 h-10 rounded-full bg-[#111111] border border-[#252525] flex items-center justify-center text-xs text-secondary"
+            className="px-4 h-10 rounded-[10px] bg-bg-raised border border-border flex items-center justify-center text-xs text-text-primary font-sans transition-smooth"
           >
-            <Minus size={16} className="mr-1 text-secondary" />
+            <Minus size={16} className="mr-1" />
             -15s
           </motion.button>
           <motion.button
-            whileTap={{ scale: 0.97 }}
+            whileTap={{ scale: 0.99 }}
             onClick={onDismiss}
-            className="px-6 h-10 rounded-full border border-[#f97316] text-xs font-semibold text-[#f97316] bg-transparent"
+            className="px-6 h-10 rounded-[10px] border border-accent text-xs font-sans font-semibold text-accent bg-transparent transition-smooth"
           >
             Skip
           </motion.button>
           <motion.button
-            whileTap={{ scale: 0.97 }}
+            whileTap={{ scale: 0.99 }}
             onClick={() => { setRemaining(r => r + 30); setTotal(t => t + 30); }}
-            className="px-4 h-10 rounded-full bg-[#111111] border border-[#252525] flex items-center justify-center text-xs text-secondary"
+            className="px-4 h-10 rounded-[10px] bg-bg-raised border border-border flex items-center justify-center text-xs text-text-primary font-sans transition-smooth"
           >
-            <Plus size={16} className="mr-1 text-secondary" />
+            <Plus size={16} className="mr-1" />
             +30s
           </motion.button>
         </div>

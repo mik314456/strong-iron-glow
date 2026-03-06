@@ -97,7 +97,7 @@ export const MUSCLE_GROUP_COLORS: Record<string, string> = {
   Back: 'bg-emerald-500/15 text-emerald-300 border border-emerald-500/40',
   Shoulders: 'bg-violet-500/15 text-violet-300 border border-violet-500/40',
   Arms: 'bg-rose-500/15 text-rose-300 border border-rose-500/40',
-  Legs: 'bg-orange-500/15 text-orange-300 border border-orange-500/40',
-  Core: 'bg-amber-500/15 text-amber-300 border border-amber-500/40',
+  Legs: 'bg-slate-500/15 text-slate-600 border border-slate-400/40',
+  Core: 'bg-slate-400/15 text-slate-600 border border-slate-400/40',
   Cardio: 'bg-cyan-500/15 text-cyan-300 border border-cyan-500/40',
 };

@@ -12,7 +12,6 @@ import {
   MoreVertical,
 } from 'lucide-react';
 import { WorkoutTemplate, WorkoutSession, SessionExercise, Exercise, TrainingSplit } from '@/types/workout';
-import { MUSCLE_GROUP_COLORS } from '@/data/exercises';
 import ActiveWorkoutScreen from './ActiveWorkoutScreen';
 import SplitBuilder from './SplitBuilder';
 import {
@@ -43,8 +42,18 @@ interface WorkoutTabProps {
   checkAndUpdatePR: (exerciseId: string, exerciseName: string, weight: number, reps: number) => any;
 }
 
-const getTemplateIcon = (id: string) => {
-  const cls = 'w-10 h-10 text-white';
+/* 3px left border accent only — no gradients */
+const TEMPLATE_LEFT_BORDER: Record<string, string> = {
+  'push-day': '#e8e0d0',   /* platinum */
+  'pull-day': '#888880',   /* muted steel */
+  'leg-day': '#666660',    /* dark steel */
+  'upper-body': '#aaa8a0', /* silver */
+  'full-body': '#ccc8c0',  /* light platinum */
+  'custom': '#333330',     /* near black */
+};
+
+const getTemplateIcon = (id: string, isSelected: boolean) => {
+  const cls = `w-7 h-7 ${isSelected ? 'text-accent' : 'text-text-tertiary'}`;
   switch (id) {
     case 'push-day':
       return <Dumbbell className={cls} />;
@@ -60,23 +69,6 @@ const getTemplateIcon = (id: string) => {
       return <Plus className={cls} />;
     default:
       return <Dumbbell className={cls} />;
-  }
-};
-
-const getTemplateGradient = (id: string) => {
-  switch (id) {
-    case 'push-day':
-      return 'bg-gradient-to-br from-[#1e3a8a] via-[#4f46e5] to-[#020617]';
-    case 'pull-day':
-      return 'bg-gradient-to-br from-[#14532d] via-[#0d9488] to-[#020617]';
-    case 'leg-day':
-      return 'bg-gradient-to-br from-[#7c2d12] via-[#ea580c] to-[#020617]';
-    case 'upper-body':
-      return 'bg-gradient-to-br from-[#312e81] via-[#1d4ed8] to-[#020617]';
-    case 'full-body':
-      return 'bg-gradient-to-br from-[#78350f] via-[#ea580c] to-[#020617]';
-    default:
-      return 'bg-[#111111]';
   }
 };
 
@@ -119,50 +111,51 @@ const WorkoutTab: React.FC<WorkoutTabProps> = ({
   };
 
   return (
-    <div className="px-4 pt-12 pb-24">
+    <div className="px-4 pt-12 pb-32">
       <div className="mb-8">
-        <h1 className="text-4xl font-bold tracking-tight text-white">
+        <h1 className="font-display text-3xl font-normal italic tracking-tight text-text-primary" style={{ letterSpacing: '-1px' }}>
           What are you training today?
         </h1>
-        <p className="mt-2 text-sm text-white/50">
+        <p className="mt-2 text-sm text-text-secondary font-sans">
           {todayLabel}
         </p>
       </div>
 
-      {/* Template Grid */}
-      <div className="grid grid-cols-2 gap-4 mb-6">
+      {/* Template Grid — solid #111, 3px left border only */}
+      <div className="grid grid-cols-2 gap-4 mb-8">
         {templates.map((t) => {
           const isSelected = selectedId === t.id;
           const todayStr = format(new Date(), 'yyyy-MM-dd');
           const doneToday = sessions.some(s => format(new Date(s.startTime), 'yyyy-MM-dd') === todayStr && s.templateId === t.id);
+          const leftBorder = TEMPLATE_LEFT_BORDER[t.id] ?? '#2a2a2a';
           return (
             <motion.button
               key={t.id}
-              whileTap={{ scale: 0.97 }}
+              whileTap={{ scale: 0.98 }}
               onClick={() => setSelectedId(t.id)}
-              className={`relative h-40 rounded-[20px] px-4 py-4 flex flex-col justify-between text-left overflow-hidden border shadow-[0_0_0_1px_rgba(255,255,255,0.05),0_4px_24px_rgba(0,0,0,0.4)] ${
-                isSelected ? 'ring-2 ring-offset-2 ring-offset-black ring-[#f97316] border-2 border-[#f97316]' : 'border-[#252525]'
-              } ${getTemplateGradient(t.id)}`}
+              className={`relative rounded-[16px] p-5 flex flex-col justify-between text-left border border-border transition-smooth ${
+                isSelected
+                  ? 'bg-bg-raised border-accent shadow-premium-active'
+                  : 'bg-bg-card hover:bg-[#161616] hover:border-border-bright'
+              }`}
+              style={{
+                borderLeftWidth: 3,
+                borderLeftColor: isSelected ? '#e8e0d0' : leftBorder,
+              }}
             >
-              {/* Large blurred gradient glow behind */}
-              <div className={`pointer-events-none absolute -inset-8 opacity-70 blur-3xl ${getTemplateGradient(t.id)}`} />
-              <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-white/5 to-transparent" />
-              {!doneToday && (
-                <div className="pointer-events-none absolute inset-0 animate-shimmer bg-gradient-to-r from-transparent via-white/5 to-transparent" />
-              )}
               {doneToday && (
-                <div className="absolute top-3 right-3 z-20 w-8 h-8 rounded-full bg-[#22c55e] flex items-center justify-center">
-                  <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                <div className="absolute top-3 right-3 w-6 h-6 rounded-full bg-success flex items-center justify-center">
+                  <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                   </svg>
                 </div>
               )}
-              <div className="relative z-10 flex items-center justify-center mt-2 mb-4">
-                {getTemplateIcon(t.id)}
+              <div className="flex items-center justify-center mt-1 mb-3">
+                {getTemplateIcon(t.id, isSelected)}
               </div>
-              <div className="relative z-10">
-                <p className="font-semibold text-[15px] text-white">{t.name}</p>
-                <p className="text-xs text-white/60 mt-1">
+              <div>
+                <p className="font-sans font-semibold text-[15px] text-text-primary">{t.name}</p>
+                <p className="text-xs text-text-secondary mt-1 font-sans">
                   {t.exerciseIds.length} movements · ~{t.exerciseIds.length * 8} min
                 </p>
               </div>
@@ -172,34 +165,41 @@ const WorkoutTab: React.FC<WorkoutTabProps> = ({
 
         {/* Custom card */}
         <motion.button
-          whileTap={{ scale: 0.97 }}
+          whileTap={{ scale: 0.98 }}
           onClick={() => setSelectedId('custom')}
-          className={`relative h-40 rounded-[20px] px-4 py-4 flex flex-col justify-between text-left overflow-hidden bg-[#111111] border-2 border-dashed ${
-            selectedId === 'custom' ? 'border-[#f97316] ring-2 ring-offset-2 ring-offset-black ring-[#f97316]' : 'border-[#252525]'
-          } shadow-[0_0_0_1px_rgba(255,255,255,0.05),0_4px_24px_rgba(0,0,0,0.4)]`}
+          className={`relative rounded-[16px] p-5 flex flex-col justify-between text-left border border-dashed transition-smooth ${
+            selectedId === 'custom'
+              ? 'bg-bg-raised border-accent shadow-premium-active'
+              : 'border-border bg-bg-card hover:bg-[#161616] hover:border-border-bright'
+          }`}
+          style={{
+            borderLeftWidth: 3,
+            borderLeftColor: selectedId ? '#e8e0d0' : '#333330',
+          }}
         >
-          <div className="flex items-center justify-center mt-2 mb-4">
-            {getTemplateIcon('custom')}
+          <div className="flex items-center justify-center mt-1 mb-3">
+            {getTemplateIcon('custom', selectedId === 'custom')}
           </div>
           <div>
-            <p className="font-semibold text-[15px] text-white">Custom</p>
-            <p className="text-xs text-white/60 mt-1">Build your own session</p>
+            <p className="font-sans font-semibold text-[15px] text-text-primary">Custom</p>
+            <p className="text-xs text-text-secondary mt-1 font-sans">Build your own session</p>
           </div>
         </motion.button>
       </div>
 
+      {/* Primary button — 56px, platinum, no glow */}
       <div className="mb-8">
         <motion.button
-          whileTap={{ scale: 0.97 }}
+          whileTap={{ scale: 0.99 }}
           disabled={!selectedId}
           onClick={handleStartSelected}
-          className={`w-full h-12 rounded-full text-sm font-semibold flex items-center justify-center gap-2 transition-colors ${
+          className={`w-full flex items-center justify-center gap-2 font-sans font-bold text-[15px] uppercase tracking-wider rounded-[10px] transition-smooth ${
             selectedId
-              ? 'bg-gradient-to-r from-[#f97316] to-[#ea580c] text-white shadow-[0_0_0_1px_rgba(255,255,255,0.05),0_4px_24px_rgba(0,0,0,0.4)]'
-              : 'bg-[#111111] text-muted-foreground border border-[#252525] cursor-not-allowed'
+              ? 'h-14 bg-accent text-primary-foreground hover:bg-[#f0e8d8]'
+              : 'h-14 bg-bg-raised text-text-tertiary border border-border cursor-not-allowed'
           }`}
         >
-          <Play size={20} className={selectedId ? 'text-white' : 'text-white/40'} />
+          <Play size={20} className={selectedId ? 'text-primary-foreground' : 'text-text-tertiary'} />
           <span>Start session</span>
         </motion.button>
       </div>
@@ -207,25 +207,25 @@ const WorkoutTab: React.FC<WorkoutTabProps> = ({
       {/* My Splits */}
       <div className="mb-8">
         <div className="flex items-center justify-between mb-3">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-white/40">
+          <p className="text-[11px] font-sans font-semibold uppercase tracking-[0.2em] text-text-secondary">
             My Splits
           </p>
           <button
             type="button"
             onClick={() => { setEditingSplit(null); setSplitBuilderOpen(true); }}
-            className="text-sm font-semibold text-[#f97316] hover:text-[#ea580c]"
+            className="text-sm font-sans font-semibold text-accent transition-smooth hover:opacity-90"
           >
             + Create
           </button>
         </div>
         {splits.length === 0 ? (
-          <div className="rounded-[20px] border border-dashed border-[#252525] bg-[#111111]/50 py-8 px-4 text-center">
-            <p className="text-white/50 text-sm mb-2">No custom splits yet</p>
-            <p className="text-white/40 text-xs mb-4">Build a weekly schedule (e.g. PPL, Upper/Lower)</p>
+          <div className="rounded-[16px] border border-dashed border-border bg-bg-raised py-8 px-4 text-center">
+            <p className="text-text-secondary text-sm font-sans mb-2">No custom splits yet</p>
+            <p className="text-text-tertiary text-xs font-sans mb-4">Build a weekly schedule (e.g. PPL, Upper/Lower)</p>
             <button
               type="button"
               onClick={() => { setEditingSplit(null); setSplitBuilderOpen(true); }}
-              className="text-[#f97316] text-sm font-semibold"
+              className="text-accent text-sm font-sans font-semibold"
             >
               Create your first split
             </button>
@@ -236,31 +236,31 @@ const WorkoutTab: React.FC<WorkoutTabProps> = ({
               <motion.div
                 key={split.id}
                 layout
-                className="bg-[#111111] rounded-[20px] border border-[#252525] p-4 flex items-center justify-between shadow-[0_0_0_1px_rgba(255,255,255,0.05)]"
+                className="bg-bg-card rounded-[16px] border border-border p-5 flex items-center justify-between transition-smooth"
               >
                 <div className="flex-1 min-w-0">
-                  <p className="font-semibold text-white truncate">{split.name}</p>
-                  <p className="text-xs text-white/50 mt-0.5">{split.days.length} days · {split.days.map(d => d.name).join(', ')}</p>
+                  <p className="font-sans font-semibold text-text-primary truncate">{split.name}</p>
+                  <p className="text-xs text-text-secondary mt-0.5 font-sans">{split.days.length} days · {split.days.map(d => d.name).join(', ')}</p>
                 </div>
                 <div className="flex items-center gap-2 ml-2">
                   <motion.button
-                    whileTap={{ scale: 0.97 }}
+                    whileTap={{ scale: 0.99 }}
                     onClick={() => onStartFromSplit(split.id)}
-                    className="px-4 py-2 rounded-full bg-[#f97316] text-white text-sm font-semibold flex items-center gap-1.5"
+                    className="px-4 py-2 rounded-[10px] bg-accent text-primary-foreground text-sm font-sans font-bold uppercase tracking-wider flex items-center gap-1.5"
                   >
                     <Play size={16} /> Start
                   </motion.button>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <button className="p-2 rounded-full hover:bg-white/10 text-white/60">
+                      <button className="p-2 rounded-lg hover:bg-bg-raised text-text-secondary transition-smooth">
                         <MoreVertical size={18} />
                       </button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="bg-[#111111] border-[#252525]">
-                      <DropdownMenuItem className="text-white focus:bg-white/10" onClick={() => { setEditingSplit(split); setSplitBuilderOpen(true); }}>
+                    <DropdownMenuContent align="end" className="bg-bg-card border-border">
+                      <DropdownMenuItem className="text-text-primary focus:bg-bg-raised font-sans" onClick={() => { setEditingSplit(split); setSplitBuilderOpen(true); }}>
                         Edit
                       </DropdownMenuItem>
-                      <DropdownMenuItem className="text-red-400 focus:bg-red-500/10 focus:text-red-400" onClick={() => onDeleteSplit(split.id)}>
+                      <DropdownMenuItem className="text-danger focus:bg-danger/10 font-sans" onClick={() => onDeleteSplit(split.id)}>
                         Delete
                       </DropdownMenuItem>
                     </DropdownMenuContent>
@@ -289,7 +289,7 @@ const WorkoutTab: React.FC<WorkoutTabProps> = ({
       {/* Recent sessions */}
       {recentSessions.length > 0 && (
         <div className="mt-2">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-white/40 mb-3">
+          <p className="text-[11px] font-sans font-semibold uppercase tracking-[0.2em] text-text-secondary mb-3">
             Recent activity
           </p>
           <div className="space-y-2">
@@ -297,15 +297,15 @@ const WorkoutTab: React.FC<WorkoutTabProps> = ({
               <motion.div
                 key={s.id}
                 layout
-                className="bg-[#111111] rounded-[20px] border border-[#252525] p-4 flex items-center justify-between shadow-[0_0_0_1px_rgba(255,255,255,0.05),0_4px_24px_rgba(0,0,0,0.4)]"
+                className="bg-bg-card rounded-[16px] border border-border p-4 flex items-center justify-between transition-smooth"
               >
                 <div>
-                  <p className="font-medium text-sm text-white">{s.templateName}</p>
-                  <p className="text-xs text-secondary mt-1">
+                  <p className="font-sans font-medium text-sm text-text-primary">{s.templateName}</p>
+                  <p className="text-xs text-text-secondary mt-1 font-sans">
                     {format(new Date(s.startTime), 'EEE, MMM d')} · {Math.round(convertWeight(s.totalVolume))} {settings.units}
                   </p>
                 </div>
-                <ChevronRight size={20} className="text-muted-foreground" />
+                <ChevronRight size={20} className="text-text-tertiary" />
               </motion.div>
             ))}
           </div>

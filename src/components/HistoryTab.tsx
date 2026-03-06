@@ -5,11 +5,11 @@ import { WorkoutSession } from '@/types/workout';
 import { AnimatePresence, motion } from 'framer-motion';
 
 const TEMPLATE_BORDER_CLASSES: Record<string, string> = {
-  'push-day': 'border-l-sky-500',
-  'pull-day': 'border-l-emerald-500',
-  'leg-day': 'border-l-orange-500',
-  'upper-body': 'border-l-indigo-500',
-  'full-body': 'border-l-amber-400',
+  'push-day': 'border-l-accent',
+  'pull-day': 'border-l-[#888880]',
+  'leg-day': 'border-l-[#666660]',
+  'upper-body': 'border-l-[#aaa8a0]',
+  'full-body': 'border-l-[#ccc8c0]',
 };
 
 interface HistoryTabProps {
@@ -24,13 +24,18 @@ const HistoryTab: React.FC<HistoryTabProps> = ({ sessions, settings, convertWeig
   if (sessions.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center h-[60vh] px-8 text-center">
-        <Dumbbell size={56} className="text-white/20 mb-4" />
-        <p className="text-xl font-bold text-white mb-2">No sessions yet</p>
-        <p className="text-sm text-white/50 mb-6">Your first rep is waiting. Let's go.</p>
+        <motion.div
+          animate={{ scale: [1, 1.08, 1], opacity: [0.25, 0.45, 0.25] }}
+          transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+        >
+          <Dumbbell size={56} className="text-text-tertiary mb-4" />
+        </motion.div>
+        <p className="text-xl font-sans font-semibold text-text-primary mb-2">No sessions yet</p>
+        <p className="text-sm text-text-secondary font-sans mb-6">Your first rep is waiting. Let's go.</p>
         <motion.button
-          whileTap={{ scale: 0.97 }}
+          whileTap={{ scale: 0.99 }}
           onClick={onStartWorkout}
-          className="bg-gradient-to-r from-[#f97316] to-[#ea580c] text-white px-6 py-3.5 rounded-full font-semibold text-sm shadow-premium-glow"
+          className="h-14 px-6 rounded-[10px] bg-accent text-primary-foreground font-sans font-bold text-[15px] uppercase tracking-wider"
         >
           Start workout
         </motion.button>
@@ -69,21 +74,21 @@ const HistoryTab: React.FC<HistoryTabProps> = ({ sessions, settings, convertWeig
       return TEMPLATE_BORDER_CLASSES[s.templateId];
     }
     const name = s.templateName.toLowerCase();
-    if (name.includes('push')) return 'border-l-sky-500';
-    if (name.includes('pull')) return 'border-l-emerald-500';
-    if (name.includes('leg')) return 'border-l-orange-500';
-    if (name.includes('upper')) return 'border-l-indigo-500';
-    if (name.includes('full')) return 'border-l-amber-400';
-    return 'border-l-slate-700';
+    if (name.includes('push')) return 'border-l-accent';
+    if (name.includes('pull')) return 'border-l-[#888880]';
+    if (name.includes('leg')) return 'border-l-[#666660]';
+    if (name.includes('upper')) return 'border-l-[#aaa8a0]';
+    if (name.includes('full')) return 'border-l-[#ccc8c0]';
+    return 'border-l-border';
   };
 
   return (
     <div className="px-4 pt-12 pb-24">
-      <h1 className="text-3xl font-bold tracking-tight text-white mb-1">Log</h1>
-      <p className="text-sm text-white/50 mb-6">Your training history</p>
+      <h1 className="font-display text-3xl font-normal italic text-text-primary mb-1" style={{ letterSpacing: '-1px' }}>Log</h1>
+      <p className="text-sm text-text-secondary font-sans mb-6">Your training history</p>
       {groups.map(g => (
-        <div key={g.label} className="mb-6">
-          <p className="text-xs font-semibold uppercase tracking-wider text-white/40 mb-2">{g.label}</p>
+        <div key={g.label} className="mb-8">
+          <p className="text-[11px] font-sans font-semibold uppercase tracking-[0.2em] text-text-secondary mb-3">{g.label}</p>
           <div className="space-y-2">
             {g.items.map(s => {
               const isExpanded = expandedId === s.id;
@@ -91,7 +96,7 @@ const HistoryTab: React.FC<HistoryTabProps> = ({ sessions, settings, convertWeig
                 <motion.div
                   key={s.id}
                   layout
-                  className={`bg-[#111111] rounded-[20px] border border-[#252525] p-4 cursor-pointer overflow-hidden border-l-4 shadow-premium ${getBorderClass(s)}`}
+                  className={`bg-bg-card border border-border border-l-[3px] border-l-accent p-4 cursor-pointer overflow-hidden transition-smooth ${getBorderClass(s)}`}
                   onClick={() => setExpandedId(prev => (prev === s.id ? null : s.id))}
                 >
                   <div className="flex items-center justify-between gap-3">
@@ -146,8 +151,8 @@ const HistoryTab: React.FC<HistoryTabProps> = ({ sessions, settings, convertWeig
                                   </p>
                                 ))}
                               {ex.sets.filter(set => set.completed).length === 0 && (
-                                <p className="text-xs text-white/40">
-                                  No sets logged
+<p className="text-xs text-muted-foreground">
+                                No sets logged
                                 </p>
                               )}
                             </div>

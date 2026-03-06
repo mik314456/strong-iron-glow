@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip } from 'recharts';
 import { WorkoutSession, PersonalRecord, AppSettings, UserProfile, TrainingGoal, ExperienceLevel } from '@/types/workout';
 import { format, subWeeks, startOfWeek, endOfWeek, isWithinInterval } from 'date-fns';
-import { Trophy, Pencil } from 'lucide-react';
+import { Trophy, Pencil, Scale, TrendingUp, Flame, Beef } from 'lucide-react';
 import { useUserProfile, DEFAULT_USER_PROFILE } from '@/hooks/useWorkoutStore';
 import {
   Dialog,
@@ -56,10 +56,10 @@ function bmiCategory(bmi: number): string {
   return 'Obese';
 }
 function bmiColor(bmi: number): string {
-  if (bmi < 18.5) return 'text-amber-400';
-  if (bmi < 25) return 'text-emerald-400';
-  if (bmi < 30) return 'text-orange-400';
-  return 'text-red-400';
+  if (bmi < 18.5) return 'text-text-secondary';
+  if (bmi < 25) return 'text-success';
+  if (bmi < 30) return 'text-text-secondary';
+  return 'text-danger';
 }
 function mifflinStJeor(age: number, heightCm: number, weightKg: number): number {
   return 10 * weightKg + 6.25 * heightCm - 5 * age + 5;
@@ -145,7 +145,7 @@ function safeProteinGrams(weightLbs: number | null): number | null {
 }
 
 const SECTION_ERROR_FALLBACK = (
-  <div className="py-4 px-4 rounded-[20px] bg-[#111111] border border-[#252525] text-white/60 text-sm text-center">
+  <div className="py-4 px-4 rounded-[16px] bg-bg-card border border-border text-text-secondary text-sm font-sans text-center">
     Something went wrong
   </div>
 );
@@ -346,12 +346,12 @@ const ProfileTab: React.FC<ProfileTabProps> = ({
   };
 
   const statRow = (label: string, value: string | number | null, onEdit?: () => void) => (
-    <div key={label} className="flex items-center justify-between py-2 border-b border-[#252525] last:border-0">
-      <span className="text-xs text-white/50">{label}</span>
+    <div key={label} className="flex items-center justify-between py-2 border-b border-border last:border-0">
+      <span className="text-xs text-text-secondary font-sans">{label}</span>
       <div className="flex items-center gap-1.5">
-        <span className="text-sm font-medium text-white">{value ?? '—'}</span>
+        <span className="text-sm font-sans font-medium text-text-primary">{value ?? '—'}</span>
         {onEdit && (
-          <button type="button" onClick={onEdit} className="p-1 rounded hover:bg-white/10 text-white/40">
+          <button type="button" onClick={onEdit} className="p-1 rounded hover:bg-bg-raised text-text-secondary transition-smooth">
             <Pencil size={12} />
           </button>
         )}
@@ -364,18 +364,18 @@ const ProfileTab: React.FC<ProfileTabProps> = ({
       name="ProfileTab"
       fallback={
         <div className="px-4 pt-12 pb-24">
-          <div className="py-8 px-4 rounded-[20px] bg-[#111111] border border-[#252525] text-white/80 text-center">
+          <div className="py-8 px-4 rounded-[16px] bg-bg-card border border-border text-text-primary text-center font-sans">
             <p className="font-semibold">Something went wrong</p>
-            <p className="text-sm text-white/50 mt-2">The profile screen couldn’t load. Try refreshing.</p>
+            <p className="text-sm text-text-secondary mt-2">The profile screen couldn’t load. Try refreshing.</p>
           </div>
         </div>
       }
     >
     <div className="px-4 pt-12 pb-24">
       {/* Your Body card */}
-      <div className="bg-[#111111] rounded-[20px] border border-[#252525] p-5 mb-6 shadow-premium">
+      <div className="bg-bg-card rounded-[16px] border border-border p-5 mb-6">
         <div className="flex items-center gap-4 mb-4">
-          <div className="w-16 h-16 rounded-full bg-gradient-to-br from-[#f97316] to-[#ea580c] flex items-center justify-center text-xl font-bold text-white shadow-premium-glow">
+          <div className="w-16 h-16 rounded-full bg-bg-raised border border-border flex items-center justify-center text-xl font-display font-normal italic text-accent">
             {initials}
           </div>
           <div className="flex-1">
@@ -386,16 +386,16 @@ const ProfileTab: React.FC<ProfileTabProps> = ({
                 updateProfile({ name: v });
                 updateSettings({ userName: v });
               }}
-              className="w-full bg-transparent outline-none text-xl font-semibold text-white placeholder:text-white/40"
+              className="w-full bg-transparent outline-none text-xl font-sans font-semibold text-text-primary placeholder:text-text-tertiary"
               placeholder="Your name"
             />
             {profile.goal != null && profile.goal in GOAL_LABELS && (
-              <span className="inline-block mt-1.5 px-2.5 py-0.5 rounded-full bg-[#f97316]/20 text-[#f97316] text-xs font-semibold">
+              <span className="inline-block mt-1.5 px-3 py-1 rounded-full border border-border bg-transparent text-text-secondary text-xs font-sans">
                 {GOAL_LABELS[profile.goal as TrainingGoal]}
               </span>
             )}
             {profile.experience != null && profile.experience in EXPERIENCE_LABELS && (
-              <p className="text-xs text-white/50 mt-1">{EXPERIENCE_LABELS[profile.experience as ExperienceLevel]}</p>
+              <p className="text-xs text-text-secondary font-sans mt-1">{EXPERIENCE_LABELS[profile.experience as ExperienceLevel]}</p>
             )}
           </div>
         </div>
@@ -409,53 +409,61 @@ const ProfileTab: React.FC<ProfileTabProps> = ({
 
       {/* Body Metrics */}
       <ErrorBoundary name="Body Metrics" fallback={SECTION_ERROR_FALLBACK}>
-        <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-white/40 mb-3">Progress metrics</p>
+        <p className="text-[11px] font-sans font-semibold uppercase tracking-[0.2em] text-text-secondary mb-3">Progress metrics</p>
         <div className="grid grid-cols-2 gap-3 mb-8">
           {bmi != null && (
-            <div className="bg-[#111111] rounded-[20px] border border-[#252525] p-4">
-              <p className="text-2xl font-bold text-white tabular-nums">{bmi.toFixed(1)}</p>
-              <p className={`text-xs font-semibold mt-0.5 ${bmiColor(bmi)}`}>{bmiCategory(bmi)}</p>
-              <p className="text-[11px] text-white/50 mt-1">BMI — body mass index</p>
+            <div className="bg-bg-card rounded-[16px] border border-[#1e1e1e] p-5 hover:border-t-accent hover:border-t-2 transition-smooth">
+              <p className="font-display text-4xl font-normal text-text-primary tabular-nums">{bmi.toFixed(1)}</p>
+              <p className={`text-xs font-sans font-semibold mt-0.5 ${bmiColor(bmi)}`}>{bmiCategory(bmi)}</p>
+              <p className="text-[11px] font-sans uppercase tracking-[0.2em] text-text-secondary mt-2 flex items-center gap-1.5">
+                <Scale className="w-3.5 h-3.5 text-text-tertiary" /> BMI — body mass index
+              </p>
             </div>
           )}
           {ffmi != null && (
-            <div className="bg-[#111111] rounded-[20px] border border-[#252525] p-4">
-              <p className="text-2xl font-bold text-white tabular-nums">{ffmi.toFixed(1)}</p>
-              <p className="text-xs text-white/70 mt-0.5">FFMI</p>
-              <p className="text-[11px] text-white/50 mt-1">Fat-free mass index</p>
+            <div className="bg-bg-card rounded-[16px] border border-[#1e1e1e] p-5 hover:border-t-accent hover:border-t-2 transition-smooth">
+              <p className="font-display text-4xl font-normal text-text-primary tabular-nums">{ffmi.toFixed(1)}</p>
+              <p className="text-xs font-sans text-text-primary mt-0.5">FFMI</p>
+              <p className="text-[11px] font-sans uppercase tracking-[0.2em] text-text-secondary mt-2 flex items-center gap-1.5">
+                <TrendingUp className="w-3.5 h-3.5 text-text-tertiary" /> Fat-free mass index
+              </p>
             </div>
           )}
           {maintenanceCals != null && (
-            <div className="bg-[#111111] rounded-[20px] border border-[#252525] p-4">
-              <p className="text-2xl font-bold text-white tabular-nums">{maintenanceCals}</p>
-              <p className="text-xs text-white/70 mt-0.5">kcal/day</p>
-              <p className="text-[11px] text-white/50 mt-1">Est. maintenance</p>
+            <div className="bg-bg-card rounded-[16px] border border-[#1e1e1e] p-5 hover:border-t-accent hover:border-t-2 transition-smooth">
+              <p className="font-display text-4xl font-normal text-text-primary tabular-nums">{maintenanceCals}</p>
+              <p className="text-xs font-sans text-text-primary mt-0.5 flex items-center gap-1.5">
+                <Flame className="w-3.5 h-3.5 text-text-tertiary" /> kcal/day
+              </p>
+              <p className="text-[11px] font-sans uppercase tracking-[0.2em] text-text-secondary mt-2">Est. maintenance</p>
             </div>
           )}
           {proteinGrams != null && (
-            <div className="bg-[#111111] rounded-[20px] border border-[#252525] p-4">
-              <p className="text-2xl font-bold text-white tabular-nums">{proteinGrams}g</p>
-              <p className="text-xs text-white/70 mt-0.5">Protein</p>
-              <p className="text-[11px] text-white/50 mt-1">Daily target</p>
+            <div className="bg-bg-card rounded-[16px] border border-[#1e1e1e] p-5 hover:border-t-accent hover:border-t-2 transition-smooth">
+              <p className="font-display text-4xl font-normal text-text-primary tabular-nums">{proteinGrams}g</p>
+              <p className="text-xs font-sans text-text-primary mt-0.5 flex items-center gap-1.5">
+                <Beef className="w-3.5 h-3.5 text-text-tertiary" /> Protein
+              </p>
+              <p className="text-[11px] font-sans uppercase tracking-[0.2em] text-text-secondary mt-2">Daily target</p>
             </div>
           )}
           {bmi == null && ffmi == null && maintenanceCals == null && proteinGrams == null && (
-            <p className="col-span-2 text-sm text-white/50">Complete your body stats above to see metrics.</p>
+            <p className="col-span-2 text-sm text-text-secondary font-sans">Complete your body stats above to see metrics.</p>
           )}
         </div>
       </ErrorBoundary>
 
       {/* Stats Grid */}
       <ErrorBoundary name="Stats Grid" fallback={SECTION_ERROR_FALLBACK}>
-        <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-white/40 mb-3">Activity</p>
+        <p className="text-[11px] font-sans font-semibold uppercase tracking-[0.2em] text-text-secondary mb-3">Activity</p>
         <div className="grid grid-cols-2 gap-3 mb-8">
           {stats.map(({ label, value }) => (
             <div
               key={label}
-              className="bg-[#111111] rounded-[20px] border border-[#252525] border-l-2 border-l-[#f97316]/50 p-4 shadow-premium"
+              className="bg-bg-card rounded-[16px] border border-[#1e1e1e] p-5 hover:border-t-accent hover:border-t-2 transition-smooth"
             >
-              <p className="text-3xl font-bold tabular-nums text-white leading-tight">{value}</p>
-              <p className="text-xs text-white/50 mt-1 uppercase tracking-wider">{label}</p>
+              <p className="font-display text-4xl font-normal text-text-primary tabular-nums leading-tight">{value}</p>
+              <p className="text-[11px] font-sans uppercase tracking-[0.2em] text-text-secondary mt-2">{label}</p>
             </div>
           ))}
         </div>
@@ -463,15 +471,15 @@ const ProfileTab: React.FC<ProfileTabProps> = ({
 
       {/* Weekly Volume Chart — fixed height to avoid Recharts zero-height crash */}
       <ErrorBoundary name="Weekly Volume Chart" fallback={SECTION_ERROR_FALLBACK}>
-        <p className="text-xs font-semibold uppercase tracking-wider text-white/50 mb-3">Weekly volume</p>
-        <div className="bg-[#111111] rounded-[20px] border border-[#252525] p-4 mb-6 w-full shadow-premium">
+        <p className="text-[11px] font-sans font-semibold uppercase tracking-[0.2em] text-text-secondary mb-3">Weekly volume</p>
+        <div className="bg-bg-card rounded-[16px] border border-border p-4 mb-6 w-full">
           <div className="w-full" style={{ height: '200px' }}>
             <ResponsiveContainer width="100%" height={200}>
               <BarChart data={weeklyData} margin={{ top: 4, right: 4, left: 0, bottom: 0 }}>
                 <XAxis dataKey="week" tick={{ fontSize: 10, fill: 'hsl(0,0%,63%)' }} />
                 <YAxis tick={{ fontSize: 10, fill: 'hsl(0,0%,63%)' }} width={40} />
                 <Tooltip contentStyle={{ backgroundColor: '#1c1c1c', border: '1px solid #2a2a2a', borderRadius: 8, fontSize: 12 }} />
-                <Bar dataKey="volume" fill="#f97316" radius={[4, 4, 0, 0]} />
+                <Bar dataKey="volume" fill="var(--accent)" radius={[4, 4, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </div>
@@ -482,23 +490,23 @@ const ProfileTab: React.FC<ProfileTabProps> = ({
       <ErrorBoundary name="Personal Records" fallback={SECTION_ERROR_FALLBACK}>
         {sortedRecords.length > 0 && (
           <div className="mb-8">
-            <p className="text-xs font-semibold uppercase tracking-wider text-white/50 mb-3">Personal bests</p>
+            <p className="text-[11px] font-sans font-semibold uppercase tracking-[0.2em] text-text-secondary mb-3">Personal bests</p>
             <div className="space-y-2">
               {sortedRecords.map((r) => (
                 <div
                   key={`${r.exerciseId}-${r.achievedAt}`}
-                  className="bg-[#111111] rounded-[20px] border border-[#252525] p-4 flex items-center justify-between shadow-premium"
-                >
-                  <div className="w-10 h-10 rounded-full bg-[#f97316]/20 border border-[#f97316]/40 flex items-center justify-center mr-3">
-                    <Trophy size={18} className="text-[#f97316]" />
+className="bg-bg-card rounded-[16px] border border-border p-4 flex items-center justify-between"
+                  >
+                  <div className="w-10 h-10 rounded-full bg-accent/10 border border-accent/40 flex items-center justify-center mr-3">
+                    <Trophy size={18} className="text-accent" />
                   </div>
                   <div className="flex-1">
-                    <p className="text-sm font-semibold text-white">{r.exerciseName}</p>
-                    <p className="text-xs text-white/50 mt-0.5 tabular-nums">
+                    <p className="text-sm font-sans font-semibold text-text-primary">{r.exerciseName}</p>
+                    <p className="text-xs text-text-secondary font-sans mt-0.5 tabular-nums">
                       {Math.round(convertWeight(r?.weight ?? 0) * 10) / 10} {settings?.units ?? 'kg'} × {r?.reps ?? 0}
                     </p>
                   </div>
-                  <p className="text-xs text-white/40 ml-3">
+                  <p className="text-xs text-text-secondary font-sans ml-3">
                     {safeFormatDate(r.achievedAt)}
                   </p>
                 </div>
@@ -510,26 +518,26 @@ const ProfileTab: React.FC<ProfileTabProps> = ({
 
       {/* Settings */}
       <ErrorBoundary name="Settings" fallback={SECTION_ERROR_FALLBACK}>
-        <p className="text-xs font-semibold uppercase tracking-wider text-white/50 mb-3">Preferences</p>
-        <div className="space-y-3">
-          <div className="bg-[#111111] rounded-[20px] border border-[#252525] p-4 flex items-center justify-between shadow-premium">
-            <span className="text-sm text-white/80">Units</span>
-            <div className="flex bg-[#0a0a0a] rounded-full overflow-hidden border border-[#252525] p-0.5">
+        <p className="text-[11px] font-sans font-semibold uppercase tracking-[0.2em] text-text-secondary mb-3">Preferences</p>
+        <div className="space-y-3 mb-8">
+          <div className="bg-bg-card rounded-[16px] border border-border p-4 flex items-center justify-between">
+            <span className="text-sm font-sans text-text-primary">Units</span>
+            <div className="flex bg-bg-raised rounded-full overflow-hidden border border-border p-0.5">
               {(['kg', 'lbs'] as const).map(u => (
                 <button
                   key={u}
                   onClick={() => updateSettings({ units: u })}
                   className={`px-4 py-2 text-xs font-semibold rounded-full transition-colors ${
-                    (settings?.units ?? 'kg') === u ? 'bg-[#f97316] text-white' : 'text-white/50'
+                    (settings?.units ?? 'kg') === u ? 'bg-accent text-[#0a0a0a]' : 'text-text-secondary'
                   }`}
                 >{u.toUpperCase()}</button>
               ))}
             </div>
           </div>
-          <div className="bg-[#111111] rounded-[20px] border border-[#252525] p-4 shadow-premium">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-sm text-white/80">Rest timer</span>
-              <span className="text-sm text-[#f97316] font-semibold tabular-nums">{settings?.restTimerDuration ?? 90}s</span>
+<div className="bg-bg-card rounded-[16px] border border-border p-4">
+              <div className="flex items-center justify-between mb-2">
+              <span className="text-sm font-sans text-text-primary">Rest timer</span>
+              <span className="text-sm text-accent font-sans font-semibold tabular-nums">{settings?.restTimerDuration ?? 90}s</span>
             </div>
             <input
               type="range"
@@ -538,11 +546,11 @@ const ProfileTab: React.FC<ProfileTabProps> = ({
               step={15}
               value={settings?.restTimerDuration ?? 90}
               onChange={(e) => updateSettings({ restTimerDuration: Number(e.target.value) })}
-              className="w-full accent-[#f97316]"
+              className="w-full accent-primary"
             />
           </div>
-          <div className="bg-[#111111] rounded-[20px] border border-[#252525] p-4 flex items-center justify-between shadow-premium">
-            <span className="text-sm text-white/80">Bodyweight</span>
+          <div className="bg-bg-card rounded-[16px] border border-border p-4 flex items-center justify-between">
+            <span className="text-sm font-sans text-text-primary">Bodyweight</span>
             <div className="flex items-center gap-2">
               <input
                 type="text"
@@ -550,24 +558,24 @@ const ProfileTab: React.FC<ProfileTabProps> = ({
                 value={settings?.bodyweight ?? ''}
                 onChange={(e) => updateSettings({ bodyweight: e.target.value ? Number(e.target.value) : null })}
                 placeholder="—"
-                className="w-20 bg-[#0a0a0a] border border-[#252525] rounded-xl px-3 py-2 text-sm text-right text-white outline-none focus:border-[#f97316]/50"
+                className="w-20 bg-bg-raised border border-border rounded-[10px] px-3 py-2 text-sm text-right text-text-primary outline-none focus:border-accent font-sans transition-smooth"
               />
-              <span className="text-xs text-white/50">{settings?.units ?? 'kg'}</span>
+              <span className="text-xs text-text-secondary font-sans">{settings?.units ?? 'kg'}</span>
             </div>
           </div>
           <motion.button
             whileTap={{ scale: 0.99 }}
             onClick={() => setShowResetConfirm(true)}
-            className="w-full bg-transparent rounded-[20px] border border-[#ef4444]/40 p-4 text-sm text-[#ef4444] font-semibold text-center hover:bg-[#ef4444]/10 transition-colors"
+            className="w-full bg-transparent rounded-[20px] border border-destructive/40 p-4 text-sm text-destructive font-semibold text-center hover:bg-destructive/10 transition-colors"
           >
             Clear all data
           </motion.button>
           {showResetConfirm && (
-            <div className="bg-[#111111] rounded-[20px] border border-[#ef4444]/40 p-4 space-y-3 shadow-premium">
-              <p className="text-sm text-white/90 font-medium">This will permanently delete all workouts, exercises, and records. This cannot be undone.</p>
+            <div className="bg-bg-card rounded-[16px] border border-danger/40 p-4 space-y-3">
+              <p className="text-sm font-sans text-text-primary font-medium">This will permanently delete all workouts, exercises, and records. This cannot be undone.</p>
               <div className="flex gap-3">
-                <motion.button whileTap={{ scale: 0.97 }} onClick={() => setShowResetConfirm(false)} className="flex-1 py-2.5 rounded-xl bg-white/10 border border-[#252525] text-sm text-white/80 font-semibold">Cancel</motion.button>
-                <motion.button whileTap={{ scale: 0.97 }} onClick={() => { onResetData(); setShowResetConfirm(false); }} className="flex-1 py-2.5 rounded-xl bg-[#ef4444] text-white text-sm font-semibold">Delete everything</motion.button>
+                <motion.button whileTap={{ scale: 0.99 }} onClick={() => setShowResetConfirm(false)} className="flex-1 py-2.5 rounded-[10px] bg-bg-raised border border-border text-sm text-text-primary font-sans font-semibold transition-smooth">Cancel</motion.button>
+                <motion.button whileTap={{ scale: 0.97 }} onClick={() => { onResetData(); setShowResetConfirm(false); }} className="flex-1 py-2.5 rounded-xl bg-destructive text-destructive-foreground text-sm font-semibold">Delete everything</motion.button>
               </div>
             </div>
           )}
@@ -576,7 +584,7 @@ const ProfileTab: React.FC<ProfileTabProps> = ({
 
       {editingField && (
         <Dialog open={true} onOpenChange={(open) => !open && setEditingField(null)}>
-          <DialogContent className="bg-[#111111] border-[#252525] text-white">
+          <DialogContent className="bg-bg-card border-border text-text-primary">
           <DialogHeader>
             <DialogTitle>
               {editingField === 'age' && 'Age'}
@@ -591,11 +599,11 @@ const ProfileTab: React.FC<ProfileTabProps> = ({
             value={editValue}
             onChange={(e) => setEditValue(e.target.value)}
             placeholder={editingField === 'height' && (profile?.heightUnit ?? 'cm') === 'ft' ? '5, 10' : ''}
-            className="w-full bg-[#0a0a0a] border border-[#252525] rounded-xl px-4 py-3 text-white focus:border-[#f97316]/50 outline-none"
+            className="w-full h-[52px] bg-bg-raised border border-border rounded-[10px] px-4 text-text-primary focus:border-accent outline-none font-sans transition-smooth"
           />
           <div className="flex gap-2">
-            <Button variant="outline" onClick={() => setEditingField(null)} className="flex-1 rounded-full bg-[#111111] border-[#252525] text-white">Cancel</Button>
-            <Button onClick={saveEdit} className="flex-1 rounded-full bg-[#f97316] text-white">Save</Button>
+            <Button variant="outline" onClick={() => setEditingField(null)} className="flex-1 rounded-[10px] bg-bg-card border-border text-text-primary font-sans">Cancel</Button>
+            <Button onClick={saveEdit} className="flex-1 rounded-[10px] h-12 bg-accent text-[#0a0a0a] font-sans font-bold uppercase tracking-wider">Save</Button>
           </div>
         </DialogContent>
         </Dialog>

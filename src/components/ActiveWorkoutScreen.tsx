@@ -2,20 +2,19 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Check, Plus, Trash2, ChevronDown, ChevronUp, Trophy } from 'lucide-react';
 import { WorkoutSession, SessionExercise, ExerciseSet, Exercise, PersonalRecord } from '@/types/workout';
-import { MUSCLE_GROUP_COLORS } from '@/data/exercises';
 import { getPreviousSets } from '@/hooks/useWorkoutStore';
 import RestTimer from './RestTimer';
 import PRCelebration from './PRCelebration';
 import WorkoutSummary from './WorkoutSummary';
 
-const MUSCLE_GROUP_BORDER_CLASSES: Record<string, string> = {
-  Chest: 'border-l-sky-500',
-  Back: 'border-l-emerald-500',
-  Shoulders: 'border-l-violet-500',
-  Arms: 'border-l-rose-500',
-  Legs: 'border-l-orange-500',
-  Core: 'border-l-amber-400',
-  Cardio: 'border-l-cyan-400',
+const MUSCLE_GROUP_LEFT_BORDER: Record<string, string> = {
+  Chest: '#e8e0d0',
+  Back: '#888880',
+  Shoulders: '#aaa8a0',
+  Arms: '#666660',
+  Legs: '#666660',
+  Core: '#888880',
+  Cardio: '#ccc8c0',
 };
 
 interface ActiveWorkoutScreenProps {
@@ -179,22 +178,22 @@ const ActiveWorkoutScreen: React.FC<ActiveWorkoutScreenProps> = ({
 
   return (
     <div className="pb-24">
-      {/* Progress bar — thin orange line */}
-      <div className="sticky top-0 z-30 bg-black/90 backdrop-blur-xl border-b border-[#252525]">
-        <div className="h-0.5 w-full bg-white/10">
+      {/* Progress bar */}
+      <div className="sticky top-0 z-30 bg-bg-card/98 backdrop-blur-xl border-b border-border">
+        <div className="h-0.5 w-full bg-bg-raised">
           <motion.div
-            className="h-full bg-[#f97316]"
+            className="h-full bg-accent"
             initial={{ width: 0 }}
             animate={{ width: `${progressPct}%` }}
             transition={{ duration: 0.3 }}
           />
         </div>
         <div className="px-5 py-3 flex items-center justify-between">
-          <p className="font-semibold text-lg tracking-tight text-white">{workout.session.templateName}</p>
+          <p className="font-sans font-semibold text-lg tracking-tight text-text-primary">{workout.session.templateName}</p>
           <motion.button
-            whileTap={{ scale: 0.97 }}
+            whileTap={{ scale: 0.99 }}
             onClick={handleFinish}
-            className="bg-[#ef4444] hover:bg-[#dc2626] text-white px-5 py-2.5 rounded-full font-semibold text-sm"
+            className="bg-danger hover:opacity-90 text-text-primary px-5 py-2.5 rounded-[10px] font-sans font-semibold text-sm"
           >
             Finish
           </motion.button>
@@ -211,13 +210,12 @@ const ActiveWorkoutScreen: React.FC<ActiveWorkoutScreenProps> = ({
           return (
             <div
               key={ex.id}
-              className={`bg-[#111111] rounded-[20px] border border-[#252525] overflow-hidden shadow-premium border-l-4 ${
-                MUSCLE_GROUP_BORDER_CLASSES[muscleGroup] || 'border-l-white/20'
-              }`}
+              className="bg-bg-card rounded-[16px] border border-border overflow-hidden border-l-[3px] transition-smooth"
+              style={{ borderLeftColor: MUSCLE_GROUP_LEFT_BORDER[muscleGroup] ?? '#2a2a2a' }}
             >
               <div className="px-5 py-4 flex items-center justify-between">
-                <p className="font-semibold text-lg text-white">{ex.exerciseName}</p>
-                <span className={`text-xs font-medium px-2.5 py-1 rounded-full ${MUSCLE_GROUP_COLORS[muscleGroup] || 'bg-white/10 text-white/80'}`}>
+                <p className="font-sans font-semibold text-lg text-text-primary">{ex.exerciseName}</p>
+                <span className="text-[11px] font-sans px-2.5 py-1 rounded-full bg-bg-raised border border-border text-text-secondary">
                   {muscleGroup}
                 </span>
               </div>
@@ -229,14 +227,14 @@ const ActiveWorkoutScreen: React.FC<ActiveWorkoutScreenProps> = ({
                   s.has(ex.id) ? s.delete(ex.id) : s.add(ex.id);
                   setExpandedNotes(s);
                 }}
-                className="px-5 pb-2 text-xs text-white/50 flex items-center gap-1 hover:text-white/70 transition-colors"
+                className="px-5 pb-2 text-xs text-text-secondary flex items-center gap-1 hover:text-text-primary transition-smooth"
               >
                 Notes {expandedNotes.has(ex.id) ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
               </button>
               {expandedNotes.has(ex.id) && (
                 <div className="px-5 pb-3">
                   <input
-                    className="w-full bg-[#0a0a0a] rounded-[14px] px-3 py-2.5 text-xs text-white border border-[#252525] focus:border-[#f97316]/50 outline-none transition-colors"
+                    className="w-full bg-bg-raised rounded-[10px] px-3 py-2.5 text-xs text-text-primary border border-border focus:border-accent outline-none font-sans transition-smooth"
                     placeholder="Add notes for this exercise..."
                   />
                 </div>
@@ -244,7 +242,7 @@ const ActiveWorkoutScreen: React.FC<ActiveWorkoutScreenProps> = ({
 
               {/* Set Table */}
               <div className="px-5 pb-4">
-                <div className="grid grid-cols-[48px_1fr_1fr_1fr_56px] gap-2 text-[11px] font-semibold text-white/40 uppercase tracking-wider mb-2">
+                <div className="grid grid-cols-[48px_1fr_1fr_1fr_56px] gap-2 text-[11px] font-sans font-semibold text-text-secondary uppercase tracking-wider mb-2">
                   <span>Set</span>
                   <span>Previous</span>
                   <span>{settings.units.toUpperCase()}</span>
@@ -263,21 +261,21 @@ const ActiveWorkoutScreen: React.FC<ActiveWorkoutScreenProps> = ({
                         return (
                           <motion.div
                             key={set.id}
-                            className={`grid grid-cols-[48px_1fr_1fr_1fr_56px] gap-2 items-center rounded-lg mb-1.5 transition-colors bg-white/[0.04] ${
-                              set.completed ? 'ring-1 ring-amber-500/30' : ''
+                            className={`grid grid-cols-[48px_1fr_1fr_1fr_56px] gap-2 items-center rounded-[10px] mb-1.5 transition-smooth bg-bg-raised/50 ${
+                              set.completed ? 'ring-1 ring-accent/30' : ''
                             }`}
                           >
                             <span className="text-center">
-                              <span className="inline-flex items-center justify-center w-8 h-8 rounded-md bg-amber-500/20 text-amber-400 text-sm font-bold">W</span>
+                              <span className="inline-flex items-center justify-center w-8 h-8 rounded-md bg-bg-raised text-text-tertiary text-sm font-sans font-bold">W</span>
                             </span>
-                            <span className="text-xs text-white/40 font-mono">—</span>
+                            <span className="text-xs text-text-tertiary font-mono">—</span>
                             <input
                               type="text"
                               inputMode="decimal"
                               value={set.weight ?? ''}
                               placeholder="0"
                               onChange={(e) => updateSet(exIdx, setIdx, 'weight', e.target.value)}
-                              className="h-16 rounded-xl px-2 text-lg font-bold text-white text-center w-full bg-[#0a0a0a] border border-[#252525] focus:border-amber-500/50 outline-none"
+                              className="h-14 rounded-[10px] px-2 text-lg font-bold text-text-primary text-center w-full bg-bg-raised border border-border focus:border-accent outline-none font-sans transition-smooth"
                             />
                             <input
                               type="text"
@@ -285,17 +283,17 @@ const ActiveWorkoutScreen: React.FC<ActiveWorkoutScreenProps> = ({
                               value={set.reps ?? ''}
                               placeholder="0"
                               onChange={(e) => updateSet(exIdx, setIdx, 'reps', e.target.value)}
-                              className="h-16 rounded-xl px-2 text-lg font-bold text-white text-center w-full bg-[#0a0a0a] border border-[#252525] focus:border-amber-500/50 outline-none"
+                              className="h-14 rounded-[10px] px-2 text-lg font-bold text-text-primary text-center w-full bg-bg-raised border border-border focus:border-accent outline-none font-sans transition-smooth"
                             />
                             <div className="flex justify-center">
                               <motion.button
-                                whileTap={{ scale: 0.8 }}
+                                whileTap={{ scale: 0.99 }}
                                 onClick={() => completeSet(exIdx, setIdx)}
-                                className={`w-10 h-10 rounded-full flex items-center justify-center border-2 transition-colors ${
-                                  set.completed ? 'bg-amber-500 border-amber-500' : 'border-white/30 hover:border-amber-500/50'
+                                className={`w-10 h-10 rounded-full flex items-center justify-center border-2 transition-smooth ${
+                                  set.completed ? 'bg-accent border-accent' : 'border-border hover:border-accent'
                                 }`}
                               >
-                                {set.completed && <Check size={18} className="text-black" />}
+                                {set.completed && <Check size={18} className="text-[#0a0a0a]" />}
                               </motion.button>
                             </div>
                           </motion.div>
@@ -307,7 +305,7 @@ const ActiveWorkoutScreen: React.FC<ActiveWorkoutScreenProps> = ({
                           type="button"
                           whileTap={{ scale: 0.99 }}
                           onClick={() => addWarmupSet(exIdx)}
-                          className="w-full py-2 mb-2 text-xs text-amber-400/80 font-medium rounded-lg border border-dashed border-amber-500/30 hover:bg-amber-500/5 transition-colors"
+                          className="w-full py-2 mb-2 text-xs text-text-secondary font-sans font-medium rounded-[10px] border border-dashed border-border hover:bg-bg-raised/50 transition-smooth"
                         >
                           Add warm-up set
                         </motion.button>
@@ -319,18 +317,18 @@ const ActiveWorkoutScreen: React.FC<ActiveWorkoutScreenProps> = ({
                         return (
                           <motion.div
                             key={set.id}
-                            className={`grid grid-cols-[48px_1fr_1fr_1fr_56px] gap-2 items-center rounded-lg mb-1.5 transition-colors ${
-                              set.completed ? 'bg-set-complete border-l-[3px] border-l-set-complete-border pl-1' : ''
+                            className={`grid grid-cols-[48px_1fr_1fr_1fr_56px] gap-2 items-center rounded-[10px] mb-1.5 transition-smooth ${
+                              set.completed ? 'bg-accent/5 border-l-[3px] border-l-accent pl-1' : ''
                             }`}
                           >
-                            <span className="text-lg font-bold text-[#f97316] text-center">{set.setNumber}</span>
+                            <span className="text-lg font-sans font-bold text-accent text-center">{set.setNumber}</span>
                             <span className="text-xs font-mono">
                               {prev ? (
-                                <span className="inline-flex px-2 py-1 rounded-full bg-white/10 text-white/60">
+                                <span className="inline-flex px-2 py-1 rounded-full bg-bg-raised text-text-secondary">
                                   {convertWeight(prev.weight)}{settings.units} × {prev.reps}
                                 </span>
                               ) : (
-                                <span className="text-white/40">—</span>
+                                <span className="text-text-tertiary">—</span>
                               )}
                             </span>
                             <input
@@ -339,7 +337,7 @@ const ActiveWorkoutScreen: React.FC<ActiveWorkoutScreenProps> = ({
                               value={set.weight ?? ''}
                               placeholder={prev ? String(convertWeight(prev.weight)) : '0'}
                               onChange={(e) => updateSet(exIdx, setIdx, 'weight', e.target.value)}
-                              className="h-16 rounded-xl px-2 text-lg font-bold text-white text-center w-full bg-[#0a0a0a] border border-[#252525] focus:border-[#f97316]/60 outline-none"
+                              className="h-14 rounded-[10px] px-2 text-lg font-bold text-text-primary text-center w-full bg-bg-raised border border-border focus:border-accent outline-none font-sans transition-smooth"
                             />
                             <input
                               type="text"
@@ -347,19 +345,19 @@ const ActiveWorkoutScreen: React.FC<ActiveWorkoutScreenProps> = ({
                               value={set.reps ?? ''}
                               placeholder={prev ? String(prev.reps) : '0'}
                               onChange={(e) => updateSet(exIdx, setIdx, 'reps', e.target.value)}
-                              className="h-16 rounded-xl px-2 text-lg font-bold text-white text-center w-full bg-[#0a0a0a] border border-[#252525] focus:border-[#f97316]/60 outline-none"
+                              className="h-14 rounded-[10px] px-2 text-lg font-bold text-text-primary text-center w-full bg-bg-raised border border-border focus:border-accent outline-none font-sans transition-smooth"
                             />
                             <div className="flex justify-center">
                               <motion.button
-                                whileTap={{ scale: 0.8 }}
+                                whileTap={{ scale: 0.99 }}
                                 onClick={() => completeSet(exIdx, setIdx)}
-                                className={`w-10 h-10 rounded-full flex items-center justify-center border-2 transition-colors ${
-                                  set.completed ? 'bg-primary border-primary' : 'border-border hover:border-primary/50'
+                                className={`w-10 h-10 rounded-full flex items-center justify-center border-2 transition-smooth ${
+                                  set.completed ? 'bg-accent border-accent' : 'border-border hover:border-accent'
                                 }`}
                               >
                                 {set.completed && (
                                   <motion.div initial={{ scale: 0.8 }} animate={{ scale: 1 }} className="animate-check-bounce">
-                                    <Check size={18} className="text-primary-foreground" />
+                                    <Check size={18} className="text-[#0a0a0a]" />
                                   </motion.div>
                                 )}
                               </motion.button>
@@ -373,7 +371,7 @@ const ActiveWorkoutScreen: React.FC<ActiveWorkoutScreenProps> = ({
                           type="button"
                           whileTap={{ scale: 0.99 }}
                           onClick={() => addWarmupSet(exIdx)}
-                          className="w-full py-2 mb-2 text-xs text-amber-400/80 font-medium rounded-lg border border-dashed border-amber-500/30 hover:bg-amber-500/5 transition-colors"
+                          className="w-full py-2 mb-2 text-xs text-text-secondary font-sans font-medium rounded-[10px] border border-dashed border-border hover:bg-bg-raised/50 transition-smooth"
                         >
                           Add warm-up set
                         </motion.button>
@@ -386,7 +384,7 @@ const ActiveWorkoutScreen: React.FC<ActiveWorkoutScreenProps> = ({
               <motion.button
                 whileTap={{ scale: 0.99 }}
                 onClick={() => addSet(exIdx)}
-                className="w-full py-3.5 text-sm text-white/50 font-medium border-t border-[#252525] hover:bg-white/[0.03] hover:text-white/70 transition-colors flex items-center justify-center gap-2"
+                className="w-full py-3.5 text-sm text-text-secondary font-sans font-medium border-t border-border hover:bg-bg-raised/50 hover:text-text-primary transition-smooth flex items-center justify-center gap-2"
               >
                 <Plus size={18} className="opacity-70" />
                 Add set

@@ -175,6 +175,7 @@ export const DEFAULT_USER_PROFILE: UserProfile = {
   experience: null,
   daysPerWeek: null,
   completedOnboardingAt: null,
+  hasCompletedSplitSelection: false,
 };
 
 export function useUserProfile() {
