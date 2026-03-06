@@ -1,6 +1,22 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { X, Plus, Minus } from 'lucide-react';
+
+function playBeep() {
+  try {
+    const ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.frequency.value = 880;
+    osc.type = 'sine';
+    gain.gain.setValueAtTime(0.15, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.12);
+    osc.start(ctx.currentTime);
+    osc.stop(ctx.currentTime + 0.12);
+  } catch {}
+}
 
 interface RestTimerProps {
   duration: number;
@@ -10,11 +26,22 @@ interface RestTimerProps {
 const RestTimer: React.FC<RestTimerProps> = ({ duration, onDismiss }) => {
   const [remaining, setRemaining] = useState(duration);
   const [total, setTotal] = useState(duration);
+  const [flash, setFlash] = useState(false);
+  const completedRef = useRef(false);
 
   useEffect(() => {
     if (remaining <= 0) {
-      if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
-      setTimeout(onDismiss, 500);
+      if (!completedRef.current) {
+        completedRef.current = true;
+        playBeep();
+        if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
+        setFlash(true);
+        const t = setTimeout(() => {
+          setFlash(false);
+          onDismiss();
+        }, 400);
+        return () => clearTimeout(t);
+      }
       return;
     }
     const t = setTimeout(() => setRemaining(r => r - 1), 1000);
@@ -22,33 +49,45 @@ const RestTimer: React.FC<RestTimerProps> = ({ duration, onDismiss }) => {
   }, [remaining, onDismiss]);
 
   const progress = remaining / total;
-  const circumference = 2 * Math.PI * 70;
+  const circumference = 2 * Math.PI * 60;
   const offset = circumference * (1 - progress);
 
   const formatTime = (s: number) => `${Math.floor(s / 60)}:${(s % 60).toString().padStart(2, '0')}`;
 
   return (
-    <motion.div
-      initial={{ y: '100%' }}
-      animate={{ y: 0 }}
-      exit={{ y: '100%' }}
-      transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-      className="fixed bottom-0 left-0 right-0 z-50 bg-card border-t border-border rounded-t-2xl px-6 py-8 safe-bottom"
-      onClick={(e) => e.stopPropagation()}
-    >
+    <>
+      {flash && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.2 }}
+          className="fixed inset-0 z-[100] pointer-events-none border-[4px] border-[#f97316] shadow-[inset_0_0_0_2px_rgba(249,115,22,0.3),0_0_60px_rgba(249,115,22,0.4)]"
+        />
+      )}
+      <motion.div
+        initial={{ y: '100%' }}
+        animate={{ y: 0 }}
+        exit={{ y: '100%' }}
+        transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+        className="fixed bottom-0 left-0 right-0 z-50 bg-black/80 backdrop-blur-xl border-t border-[#252525] rounded-t-[28px] px-6 py-8 safe-bottom shadow-[0_0_0_1px_rgba(255,255,255,0.05),0_-4px_24px_rgba(0,0,0,0.6)]"
+        onClick={(e) => e.stopPropagation()}
+      >
       <div className="flex justify-between items-center mb-6">
-        <span className="text-sm font-semibold text-muted-foreground">Rest Timer</span>
-        <button onClick={onDismiss} className="p-2"><X size={18} className="text-muted-foreground" /></button>
+        <span className="text-xs font-semibold uppercase tracking-[0.16em] text-white/50">Recover</span>
+        <motion.button whileTap={{ scale: 0.97 }} onClick={onDismiss} className="p-2 rounded-full hover:bg-white/5 transition-colors">
+          <X size={18} className="text-white/50" />
+        </motion.button>
       </div>
 
       <div className="flex flex-col items-center">
         <div className="relative w-40 h-40 mb-6">
-          <svg className="w-full h-full -rotate-90" viewBox="0 0 160 160">
-            <circle cx="80" cy="80" r="70" fill="none" stroke="hsl(var(--border))" strokeWidth="6" />
+          <svg className="w-full h-full -rotate-90" viewBox="0 0 140 140">
+            <circle cx="70" cy="70" r="60" fill="none" stroke="#252525" strokeWidth="8" />
             <circle
-              cx="80" cy="80" r="70" fill="none"
-              stroke="hsl(var(--primary))"
-              strokeWidth="6"
+              cx="70" cy="70" r="60" fill="none"
+              stroke="#f97316"
+              strokeWidth="8"
               strokeLinecap="round"
               strokeDasharray={circumference}
               strokeDashoffset={offset}
@@ -56,32 +95,38 @@ const RestTimer: React.FC<RestTimerProps> = ({ duration, onDismiss }) => {
             />
           </svg>
           <div className="absolute inset-0 flex items-center justify-center">
-            <span className="text-4xl font-bold text-primary font-mono">{formatTime(remaining)}</span>
+            <span className="text-5xl font-bold text-[#f97316] font-mono">{formatTime(remaining)}</span>
           </div>
         </div>
 
-        <div className="flex items-center gap-6">
-          <button
+        <div className="flex items-center gap-4">
+          <motion.button
+            whileTap={{ scale: 0.97 }}
             onClick={() => { setRemaining(r => Math.max(0, r - 15)); setTotal(t => Math.max(15, t - 15)); }}
-            className="w-12 h-12 rounded-full bg-card-elevated border border-border flex items-center justify-center"
+            className="px-4 h-10 rounded-full bg-[#111111] border border-[#252525] flex items-center justify-center text-xs text-secondary"
           >
-            <Minus size={18} className="text-muted-foreground" />
-          </button>
-          <button
+            <Minus size={16} className="mr-1 text-secondary" />
+            -15s
+          </motion.button>
+          <motion.button
+            whileTap={{ scale: 0.97 }}
             onClick={onDismiss}
-            className="px-6 py-3 bg-primary text-primary-foreground rounded-lg font-semibold text-sm"
+            className="px-6 h-10 rounded-full border border-[#f97316] text-xs font-semibold text-[#f97316] bg-transparent"
           >
             Skip
-          </button>
-          <button
+          </motion.button>
+          <motion.button
+            whileTap={{ scale: 0.97 }}
             onClick={() => { setRemaining(r => r + 30); setTotal(t => t + 30); }}
-            className="w-12 h-12 rounded-full bg-card-elevated border border-border flex items-center justify-center"
+            className="px-4 h-10 rounded-full bg-[#111111] border border-[#252525] flex items-center justify-center text-xs text-secondary"
           >
-            <Plus size={18} className="text-muted-foreground" />
-          </button>
+            <Plus size={16} className="mr-1 text-secondary" />
+            +30s
+          </motion.button>
         </div>
       </div>
     </motion.div>
+    </>
   );
 };
 
