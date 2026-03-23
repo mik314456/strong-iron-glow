@@ -4,6 +4,7 @@ import BottomTabBar, { TabId } from '@/components/BottomTabBar';
 import WorkoutTab from '@/components/WorkoutTab';
 import HistoryTab from '@/components/HistoryTab';
 import ExercisesTab from '@/components/ExercisesTab';
+import ScienceTab from '@/components/ScienceTab';
 import ProfileTab from '@/components/ProfileTab';
 import Onboarding from '@/components/Onboarding';
 import SplitSelectionScreen from '@/components/SplitSelectionScreen';
@@ -200,6 +201,9 @@ const Index = () => {
               convertWeight={convertWeight}
               onAddExercise={addExercise}
             />
+          )}
+          {tab === 'science' && (
+            <ScienceTab />
           )}
           {tab === 'profile' && (
             <ProfileTab

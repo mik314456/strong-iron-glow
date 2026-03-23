@@ -1,13 +1,14 @@
 import React from 'react';
-import { Dumbbell, Clock, BookOpen, User } from 'lucide-react';
+import { Dumbbell, Clock, BookOpen, FlaskConical, User } from 'lucide-react';
 import { motion } from 'framer-motion';
 
-export type TabId = 'workout' | 'history' | 'exercises' | 'profile';
+export type TabId = 'workout' | 'history' | 'exercises' | 'science' | 'profile';
 
 const tabs: { id: TabId; label: string; icon: React.ElementType }[] = [
   { id: 'workout', label: 'Train', icon: Dumbbell },
   { id: 'history', label: 'Log', icon: Clock },
   { id: 'exercises', label: 'Library', icon: BookOpen },
+  { id: 'science', label: 'Science', icon: FlaskConical },
   { id: 'profile', label: 'You', icon: User },
 ];
 

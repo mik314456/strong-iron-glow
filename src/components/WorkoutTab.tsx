@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import {
   Plus,
@@ -21,6 +21,76 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { format } from 'date-fns';
+
+function getStreakFromSessions(sessions: WorkoutSession[]): number {
+  if (!sessions?.length) return 0;
+  const days = new Set<string>();
+  sessions.forEach(s => {
+    try {
+      const d = s?.startTime ? new Date(s.startTime) : null;
+      if (d && !isNaN(d.getTime())) days.add(format(d, 'yyyy-MM-dd'));
+    } catch {}
+  });
+  const sorted = Array.from(days).sort().reverse();
+  const today = format(new Date(), 'yyyy-MM-dd');
+  const yesterday = format(new Date(Date.now() - 86400000), 'yyyy-MM-dd');
+  if (sorted[0] !== today && sorted[0] !== yesterday) return 0;
+  let current = 1;
+  for (let i = 1; i < sorted.length; i++) {
+    const d1 = new Date(sorted[i - 1]).getTime();
+    const d2 = new Date(sorted[i]).getTime();
+    if ((d1 - d2) / 86400000 <= 1) current++;
+    else break;
+  }
+  return current;
+}
+
+function getNextMilestone(current: number): number {
+  if (current < 7) return 7;
+  if (current < 14) return 14;
+  if (current < 30) return 30;
+  return Math.ceil((current + 1) / 30) * 30;
+}
+
+function getStreakStartDate(sessions: WorkoutSession[]): string | null {
+  if (!sessions?.length) return null;
+  const days = new Set<string>();
+  sessions.forEach(s => {
+    try {
+      const d = s?.startTime ? new Date(s.startTime) : null;
+      if (d && !isNaN(d.getTime())) days.add(format(d, 'yyyy-MM-dd'));
+    } catch {}
+  });
+  const sorted = Array.from(days).sort().reverse();
+  const today = format(new Date(), 'yyyy-MM-dd');
+  const yesterday = format(new Date(Date.now() - 86400000), 'yyyy-MM-dd');
+  if (sorted[0] !== today && sorted[0] !== yesterday) return null;
+  let count = 1;
+  for (let i = 1; i < sorted.length; i++) {
+    const d1 = new Date(sorted[i - 1]).getTime();
+    const d2 = new Date(sorted[i]).getTime();
+    if ((d1 - d2) / 86400000 <= 1) count++;
+    else break;
+  }
+  const oldestIndex = count - 1;
+  return sorted[oldestIndex] ?? null;
+}
+
+function getCountdownToMilestone(streakStartStr: string | null, nextMilestone: number, currentTime: number): number {
+  const start = streakStartStr ? new Date(streakStartStr + 'T00:00:00') : new Date();
+  if (isNaN(start.getTime())) return 0;
+  const target = new Date(start);
+  target.setDate(target.getDate() + nextMilestone);
+  return Math.max(0, target.getTime() - currentTime);
+}
+
+function msToDhmS(ms: number): { d: number; h: number; m: number; s: number } {
+  const s = Math.floor((ms / 1000) % 60);
+  const m = Math.floor((ms / (1000 * 60)) % 60);
+  const h = Math.floor((ms / (1000 * 60 * 60)) % 24);
+  const d = Math.floor(ms / (1000 * 60 * 60 * 24));
+  return { d, h, m, s };
+}
 
 interface WorkoutTabProps {
   templates: WorkoutTemplate[];
@@ -102,6 +172,22 @@ const WorkoutTab: React.FC<WorkoutTabProps> = ({
   const recentSessions = sessions.slice(0, 3);
   const todayLabel = format(new Date(), 'EEEE, MMMM d');
 
+  const streakDays = useMemo(() => getStreakFromSessions(sessions), [sessions]);
+  const nextMilestone = useMemo(() => getNextMilestone(streakDays), [streakDays]);
+  const streakStartStr = useMemo(() => getStreakStartDate(sessions), [sessions]);
+
+  const [now, setNow] = useState(Date.now());
+  useEffect(() => {
+    const id = setInterval(() => setNow(Date.now()), 1000);
+    return () => clearInterval(id);
+  }, []);
+
+  const countdownMs = useMemo(
+    () => getCountdownToMilestone(streakStartStr, nextMilestone, now),
+    [streakStartStr, nextMilestone, now]
+  );
+  const { d, h, m, s } = useMemo(() => msToDhmS(countdownMs), [countdownMs]);
+
   const handleStartSelected = () => {
     if (!selectedId) return;
     const template = selectedId === 'custom'
@@ -119,6 +205,43 @@ const WorkoutTab: React.FC<WorkoutTabProps> = ({
         <p className="mt-2 text-sm text-text-secondary font-sans">
           {todayLabel}
         </p>
+      </div>
+
+      {/* Countdown to next milestone — single line 0d 0h 0m 0s, centered, seconds tick in real time */}
+      <div className="mb-8 flex justify-center">
+        <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'flex-end', gap: '24px' }}>
+          {[
+            { value: d, label: 'd' },
+            { value: h, label: 'h' },
+            { value: m, label: 'm' },
+            { value: s, label: 's' },
+          ].map(({ value, label }) => (
+            <div key={label} style={{ display: 'flex', alignItems: 'flex-end' }}>
+              <span
+                style={{
+                  fontSize: '72px',
+                  fontWeight: 800,
+                  color: '#ffffff',
+                  letterSpacing: '-0.02em',
+                  lineHeight: 1,
+                }}
+              >
+                {value}
+              </span>
+              <span
+                style={{
+                  fontSize: '13px',
+                  fontWeight: 400,
+                  color: '#444444',
+                  marginLeft: '2px',
+                  paddingBottom: '8px',
+                }}
+              >
+                {label}
+              </span>
+            </div>
+          ))}
+        </div>
       </div>
 
       {/* Template Grid — solid #111, 3px left border only */}
